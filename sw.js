@@ -1,16 +1,23 @@
-const CACHE_NAME = "mypayindia-cache-v1";
+const CACHE_NAME = "mpi1";
 const ASSETS = [
   "/",
   "/index.html",
   "/manifest.json",
   "/app/stylesheets/main.css",
   "/app/stylesheets/views.css",
+  "/app/stylesheets/fontawesome.css",
+
   "/app/scripts/app.js",
   "/app/scripts/api.js",
   "/app/scripts/menu.js",
   "/app/scripts/theme.js",
   "/app/scripts/devmode.js",
-  "/app/scripts/quickActions.js"
+  "/app/scripts/quickActions.js",
+
+  "/app/webfonts/fa-brands-400.woff2",
+  "/app/webfonts/fa-regular-400.woff2",
+  "/app/webfonts/fa-solid-900.woff2",
+  "/app/webfonts/fa-v4compatibility.woff2"
 ];
 
 self.addEventListener("install", (event) => {
