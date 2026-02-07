@@ -1,6 +1,8 @@
 {
   "name": "MyPayIndia",
-  "description": "PWA for MyPayIndia",
+  "description": "The future of online banking",
+  "packaged": "com.mypayindia.app",
+  "scope": "/",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /sw.js
+Disallow: /app/
+Disallow: LICENSE
+Disallow: .gitignore
+Disallow: /flow/
