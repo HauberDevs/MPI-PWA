@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyPayIndia</title>
+    <meta name="theme-color" content="#d03505" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="/app/stylesheets/main.css" />
+    <link rel="stylesheet" href="/app/stylesheets/views.css" />
+</head>
+
+<body>
+    <div class="app">
+        <header class="topbar">
+            <a class="logo-link route-link" data-route href="/dashboard">
+                <img class="logo" src="https://mypayindia.com/siteassets/images/branding/logo-full.png"
+                    alt="MyPayIndia Logo" />
+            </a>
+
+            <div class="topbar-actions noselect">
+                <div class="user-pill" id="userStatusPill" aria-live="polite" role="button" tabindex="0">
+                    <i class="fa-regular fa-user"></i>
+                    <div class="user-pill-text">
+                        <span class="user-pill-label">Logged in as</span>
+                        <span class="user-pill-username" id="userStatusName">...</span>
+                    </div>
+                </div>
+                <div class="balance-pill" id="balanceStatusPill" aria-live="polite">
+                    <i class="fa-solid fa-wallet"></i>
+                    <div class="balance-pill-text">
+                        <span class="balance-pill-label">Balance</span>
+                        <span class="balance-pill-value" id="balanceStatusValue">&#8377;0.00</span>
+                    </div>
+                </div>
+                <button class="menu-btn" id="menuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <aside class="menu" id="menu">
+            <div class="menu-header">
+                <img class="logo" src="https://mypayindia.com/siteassets/images/branding/logo-full.png"
+                    alt="MyPayIndia Logo" /> <button class="menu-close" id="closeMenuBtn" type="button"
+                    aria-label="Close menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="listButtons">
+                <h2>Home</h2>
+                <a class="menu-link route-link" data-route href="/dashboard">
+                    <i class="fa-solid fa-house"></i>
+                    Dashboard
+                </a>
+
+                <a class="menu-link route-link" data-route href="/leaderboard">
+                    <i class="fa-solid fa-trophy"></i>
+                    Leaderboard
+                </a>
+            </div>
+
+            <div class="listButtons">
+                <h2>Meta</h2>
+
+                <a class="menu-link grouped-link" href="https://mypayindia.com/team">
+                    <i class="fa-solid fa-people-group"></i>
+                    Meet the team
+                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                        style="--fa-rotate-angle: 320deg;"></i>
+                </a>
+                <a class="menu-link grouped-link" href="https://mypayindia.com/docs/">
+                    <i class="fa-solid fa-book"></i>
+                    Documentation
+                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                        style="--fa-rotate-angle: 320deg;"></i>
+                </a>
+            </div>
+
+            <div id="accountMenu" class="hidden">
+                <h2>Your account</h2>
+
+                <a class="menu-link route-link" data-route href="/history">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    History
+                </a>
+
+                <a class="menu-link route-link" data-route href="/transfer">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Transfer
+                </a>
+
+                <a class="menu-link route-link" data-route href="/payment-link">
+                    <i class="fa-solid fa-link"></i>
+                    Payment links
+                </a>
+
+                <a class="menu-link route-link hidden" data-route data-dev-only href="/lookup-link">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Lookup link
+                </a>
+
+                <a class="menu-link route-link hidden" data-route data-dev-only
+                    href="https://mypayindia.com/accountservices/moneygenerator/">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    Money generator
+                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                        style="--fa-rotate-angle: 320deg;"></i>
+                </a>
+
+                <a class="menu-link route-link hidden" data-route data-dev-only
+                    href="https://mypayindia.com/accountservices/dashboard/">
+                    <i class="fa-solid fa-house-chimney"></i>
+                    Main dashboard
+                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                        style="--fa-rotate-angle: 320deg;"></i>
+                </a>
+
+            </div>
+
+
+
+            <div class="toggle-stack">
+                <h2>App control</h2>
+                <div class="toggle-card">
+                    <span class="toggle-label"><i class="fa-solid fa-moon"></i> Dark mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-card">
+                    <span class="toggle-label"><i class="fa-solid fa-code"></i> More items</span>
+                    <label class="switch">
+                        <input type="checkbox" id="devSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="menu-link secondary hidden" id="installBtn" type="button">
+                <i class="fa-solid fa-download"></i>
+                Install app
+            </button>
+            <a class="menu-link route-link hidden" data-route href="/flow/logout" id="logoutBtn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Log out
+            </a>
+        </aside>
+
+        <main>
+            <div class="login-warning hidden" id="loginWarning" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>You must log in first</span>
+            </div>
+            <div id="flowViews">
+                <section id="loginView" class="view">
+                    <section class="card" id="loginCard">
+                        <h1><i class="fa-solid fa-user-lock"></i> Log in to MyPayIndia</h1>
+                        <p class="muted"><a href="https://mypayindia.com/accountservices/register">If you do not have an
+                                account, please sign up on the main website</a>
+                        </p>
+                        <form id="loginForm">
+                            <input type="text" id="username" placeholder="Username" required />
+
+                            <input type="password" id="password" placeholder="Password" required />
+                            <br>
+                            <button class="primary big" type="submit">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                Log in
+                            </button>
+                        </form>
+                        <p class="muted" id="loginStatus"></p>
+                    </section>
+                </section>
+
+                <section id="logoutView" class="view hidden">
+                    <section class="card">
+                        <h1><i class="fa-solid fa-right-from-bracket"></i> Log out?</h1>
+                        <p class="muted">Are you sure you want to log out?</p>
+                        <div class="flow-actions">
+                            <button class="secondary" id="cancelLogoutBtn">Cancel</button>
+                            <button class="primary" id="confirmLogoutBtn">Log out</button>
+                        </div>
+                    </section>
+                </section>
+            </div>
+
+            <div id="appViews">
+                <section id="dashboardView" class="view hidden">
+                    <section class="card hidden" id="dashboardCard">
+                        <h1>
+                            <i class="fa-solid fa-house"></i>
+                            Welcome back, <span id="displayUser"></span>!
+                        </h1>
+
+                        <p class="muted">
+                            Your current balance: <strong id="displayBalance">&#8377;0.00</strong>
+                        </p>
+                    </section>
+
+                    <section class="card hidden" id="ctaCard">
+                        <h2>
+                            <i class="fa-solid fa-arrow-right"></i>
+                            Quick actions
+                        </h2>
+                        <div class="cta-buttons">
+                            <a class="primary route-link cta-btn" data-route href="/transfer">
+                                <i class="fa-solid fa-comment-dollar"></i>
+                                Transfer
+                            </a>
+                            <a class="secondary route-link cta-btn" data-route href="/payment-link">
+                                <i class="fa-solid fa-comments-dollar"></i>
+                                Create payment link
+                            </a>
+                        </div>
+                    </section>
+                    <section class="card hidden" id="transactionsCard">
+                        <div class="card-heading">
+                            <h2>
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                Recent activity
+                            </h2>
+                            <button class="icon-btn hidden" id="refreshTxnBtn" type="button"
+                                title="Refresh transactions">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="txnList" class="activity">
+                            <p class="muted">Log in first!</p>
+                        </div>
+                    </section>
+                </section>
+
+                <section id="leaderboardView" class="view hidden">
+                    <section class="card" id="leaderboardCard">
+                        <h2>
+                            <i class="fa-solid fa-trophy"></i>
+                            Leaderboard
+                        </h2>
+                        <ol id="leaderboardList" class="leaderboard"></ol>
+                        <p class="muted fa-fade" id="leaderboardStatus">Retrieving data...</p>
+                    </section>
+                </section>
+
+                <section id="historyView" class="view hidden">
+                    <section class="card" id="historyCard">
+                        <div class="card-heading">
+                            <h2>
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                Transactions
+                            </h2>
+                            <button class="icon-btn hidden" id="refreshHistoryBtn" type="button"
+                                title="Refresh history">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                        </div>
+                        <div id="historyList" class="activity"></div>
+                        <p class="muted" id="historyStatus">Log in first!</p>
+                    </section>
+                </section>
+
+                <section id="transferView" class="view hidden">
+                    <section class="card" id="transferCard">
+                        <h2>
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Transfer
+                        </h2>
+                        <form id="transferForm" class="form-stack">
+                            <p class="muted"><strong>Keep in mind</strong>: transfers above a certain amount are subject
+                                to manual review by our team.</p>
+                            <input type="number" min="0" step="0.01" name="amount" placeholder="How much?" required />
+                            <input type="text" name="recipient" placeholder="To who?" required />
+                            <input type="text" name="note" placeholder="An optional note?" />
+                            <button class="primary" type="submit">Send it!</button>
+                            <p class="muted form-status" id="transferStatus"></p>
+                        </form>
+                    </section>
+                </section>
+
+                <section id="paymentLinkView" class="view hidden">
+                    <section class="card" id="paymentLinkCard">
+                        <h2>
+                            <i class="fa-solid fa-link"></i>
+                            Create a payment link
+                        </h2>
+                        <form id="paymentLinkForm" class="form-stack">
+                            <input type="number" min="0" step="0.01" name="amount" placeholder="How much?" required />
+                            <input type="text" name="note" placeholder="An optional note?" />
+                            <button class="primary" type="submit">Create</button>
+                            <p class="muted form-status" id="paymentLinkStatus"></p>
+                        </form>
+                        <div class="result-panel hidden" id="paymentLinkResult">
+                            <p class="result-text" id="paymentLinkResultText"></p>
+                            <button class="icon-btn" type="button" id="paymentLinkCopyBtn">
+                                <i class="fa-solid fa-copy"></i>
+                                Copy to clipboard
+                            </button>
+                        </div>
+                    </section>
+                </section>
+
+                <section id="lookupView" class="view hidden">
+                    <section class="card" id="lookupCard">
+                        <h2>
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Lookup payment link
+                        </h2>
+                        <form id="lookupLinkForm" class="form-stack">
+                            <input type="text" name="token" placeholder="The link, sans mypayindia.com/pay/link?token="
+                                required />
+                            <button class="secondary" type="submit">Look it up!</button>
+                            <p class="muted form-status" id="lookupLinkStatus"></p>
+                        </form>
+                        <div class="lookup-result hidden" id="lookupResult" aria-live="polite">
+                            <p class="lookup-amount" id="lookupAmount">₹0.00</p>
+                            <p class="lookup-author" id="lookupAuthor">@username</p>
+                            <p class="lookup-note" id="lookupNote">No note</p>
+                            <a class="primary lookup-pay-btn hidden" id="lookupPayBtn" href="#" target="_blank"
+                                rel="noopener">Claim<i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                                    style="--fa-rotate-angle: 320deg;"></i></a>
+                        </div>
+                    </section>
+                </section>
+
+            </div>
+
+        </main>
+
+        <footer class="app-footer noselect">
+            v0 - app by <a href="https://exerinity.dev">exerinity</a> - environment: <strong id="envLabel">..</strong>
+        </footer>
+    </div>
+    <script src="/app/scripts/menu.js"></script>
+    <script src="/app/scripts/theme.js"></script>
+    <script src="/app/scripts/devmode.js"></script>
+    <script src="/app/scripts/api.js"></script>
+    <script src="/app/scripts/app.js"></script>
+    <script src="/app/scripts/quick.js"></script>
+</body>
+
+</html>

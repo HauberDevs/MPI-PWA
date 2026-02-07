@@ -1,0 +1,17 @@
+{
+  "name": "MyPayIndia",
+  "description": "PWA for MyPayIndia",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d03505",
+  "orientation": "portrait",
+
+  "icons": [
+    {
+      "src": "/app/media/logo.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ]
+}
