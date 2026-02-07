@@ -1,4 +1,20 @@
-const path = "http://localhost:3000";
+function guessServer() {
+  const host = window.location.host;
+  if (host.includes("localhost") || host.includes("127.0")) {
+    return "http://localhost:3000";
+  }
+  if (host.includes(".staging.mypayindia.com")) {
+    return "https://staging.mypayindia.com";
+  }
+
+  if (host.includes("app.mypayindia.com")) {
+    return "https://mypayindia.com";
+  }
+
+  return window.location.origin;
+}
+
+const path = guessServer();
 
 async function apiLogin(username, password) {
   const res = await fetch(path + "/api/v1/login", {
