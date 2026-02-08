@@ -60,6 +60,17 @@ const ROUTE_PATHS = {
   lookup: "/lookup-link"
 };
 
+const ROUTE_TITLES = {
+  dashboard: "Dashboard",
+  history: "History",
+  transfer: "Transfer",
+  paymentLink: "New payment link",
+  loginFlow: "Log in to MyPayIndia",
+  logoutFlow: "Log out",
+  leaderboard: "Leaderboard",
+  lookup: "Payment link info"
+};
+
 const AUTH_REQUIRED_ROUTES = new Set([
   "dashboard",
   "history",
@@ -474,6 +485,7 @@ function applyRoute(route) {
   });
 
   currentRoute = key;
+  document.title = ROUTE_TITLES[key] + " / MyPayIndia" || "MyPayIndia";
   setActiveRouteLinks(NAV_ROUTES.has(key) ? key : null);
 
   if (key === "leaderboard") {
