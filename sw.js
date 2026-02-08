@@ -1,23 +1,26 @@
 const CACHE_NAME = "mpi1";
 const ASSETS = [
   "/",
+  "/favicon.ico",
   "/index.html",
+  "/LICENSE",
   "/manifest.json",
-  "/app/stylesheets/main.css",
-  "/app/stylesheets/views.css",
-  "/app/stylesheets/fontawesome.css",
+  "/robots.txt",
+  "/sw.js",
 
-  "/app/scripts/app.js",
+  "/app/media/logo.png",
+  "/app/media/logofull.png",
+
   "/app/scripts/api.js",
-  "/app/scripts/menu.js",
-  "/app/scripts/theme.js",
+  "/app/scripts/app.js",
   "/app/scripts/devmode.js",
-  "/app/scripts/quickActions.js",
+  "/app/scripts/menu.js",
+  "/app/scripts/quick.js",
+  "/app/scripts/theme.js",
 
-  "/app/webfonts/fa-brands-400.woff2",
-  "/app/webfonts/fa-regular-400.woff2",
-  "/app/webfonts/fa-solid-900.woff2",
-  "/app/webfonts/fa-v4compatibility.woff2"
+  "/app/stylesheets/fontawesome.css",
+  "/app/stylesheets/main.css",
+  "/app/stylesheets/views.css"
 ];
 
 self.addEventListener("install", (event) => {

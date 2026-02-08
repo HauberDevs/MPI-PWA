@@ -2,23 +2,42 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
     <title>MyPayIndia</title>
-    <meta name="theme-color" content="#d03505" />
-    <link rel="manifest" href="/manifest.json" />
+    <meta name="description" content="The future of online banking">
+
+    <!-- theme -->
+    <meta name="theme-color" content="#d03505">
+
+    <!-- manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- ios pwa -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyPayIndia">
+
+    <!-- reg meta -->
+    <meta property="og:title" content="MyPayIndia">
+    <meta property="og:description" content="The future of online banking">
+    <meta property="og:image" content="/app/media/logofull.png">
+    <meta property="og:type" content="website">
+
+    <!-- twitter/x -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MyPayIndia">
     <meta name="twitter:description" content="The future of online banking">
-    <link rel="stylesheet" href="/app/stylesheets/fontawesome.css" />
-    <link rel="stylesheet" href="/app/stylesheets/main.css" />
-    <link rel="stylesheet" href="/app/stylesheets/views.css" />
+    <meta name="twitter:image" content="/app/media/logofull.png">
+
+    <!-- misc security -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
 </head>
 
 <body>
     <div class="app">
         <header class="topbar">
             <a class="logo-link route-link" data-route href="/dashboard">
-                <img class="logo" src="https://mypayindia.com/siteassets/images/branding/logo-full.png"
-                    alt="MyPayIndia Logo" />
+                <img class="logo" src="/app/media/logofull.png" alt="MyPayIndia Logo" />
             </a>
 
             <div class="topbar-actions noselect">
@@ -44,9 +63,8 @@
 
         <aside class="menu" id="menu">
             <div class="menu-header">
-                <img class="logo" src="https://mypayindia.com/siteassets/images/branding/logo-full.png"
-                    alt="MyPayIndia Logo" /> <button class="menu-close" id="closeMenuBtn" type="button"
-                    aria-label="Close menu">
+                <img class="logo" src="/app/media/logofull.png" alt="MyPayIndia Logo" /> <button class="menu-close"
+                    id="closeMenuBtn" type="button" aria-label="Close menu">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -166,7 +184,8 @@
                 <div class="login-warning" role="alert">
                     <i class="fa-solid fa-ban fa-fade"></i>
                     <span>JavaScript is disabled. Please enable it to continue. <a
-                            href="https://support.google.com/adsense/answer/12654?hl=en" target="_blank" class="muted">Learn
+                            href="https://support.google.com/adsense/answer/12654?hl=en" target="_blank"
+                            class="muted">Learn
                             how...</a></span>
                 </div>
             </noscript>
@@ -199,7 +218,8 @@
                             <button class="secondary" id="cancelLogoutBtn">Cancel</button>
                             <button class="primary" id="confirmLogoutBtn">Log out</button>
                         </div>
-                        <p class="muted"><strong>Keep in mind</strong>: to ensure you <i>actually get logged out</i>, perform a hard refresh (CTRL/CMD+Shift+R) and/or clear your cookies.</p>
+                        <p class="muted"><strong>Keep in mind</strong>: to ensure you <i>actually get logged out</i>,
+                            perform a hard refresh (CTRL/CMD+Shift+R) and/or clear your cookies.</p>
                     </section>
                 </section>
             </div>
@@ -211,13 +231,20 @@
                             <i class="fa-solid fa-door-open"></i>
                             Welcome to the MyPayIndia PWA
                         </h1>
-                        <p>This is a new, experimental app for MyPayIndia, designed mostly for cross-platform use. This app is still in an early state, so please keep in mind:</p>
+                        <p>This is a new, experimental app for MyPayIndia, designed mostly for cross-platform use. This
+                            app is still in an early state, so please keep in mind:</p>
                         <ul>
-                            <li>This is not a substitute for <a href="https://mypayindia.com" target="_blank">MyPayIndia.com</a> and does not take precedence over it</li>
-                            <li>Not everything that can be performed on <a href="https://mypayindia.com" target="_blank">MyPayIndia.com</a> can be performed here</li>
-                            <li>This app is (or should be seen as) completely standalone from the main <a href="https://mypayindia.com" target="_blank">MyPayIndia.com</a> website</li>
-                            <li>The source code is available at <a href="https://github.com/MyPayIndiaDevs/pwa" target="_blank">https://github.com/MyPayIndiaDevs/pwa</a></li>
-                            <li>By using this service, you agree to the <a href="https://mypayindia.com/terms" target="_blank">terms and conditions</a>, constituted by your initial registration</li>
+                            <li>This is not a substitute for <a href="https://mypayindia.com"
+                                    target="_blank">MyPayIndia.com</a> and does not take precedence over it</li>
+                            <li>Not everything that can be performed on <a href="https://mypayindia.com"
+                                    target="_blank">MyPayIndia.com</a> can be performed here</li>
+                            <li>This app is (or should be seen as) completely standalone from the main <a
+                                    href="https://mypayindia.com" target="_blank">MyPayIndia.com</a> website</li>
+                            <li>The source code is available at <a href="https://github.com/MyPayIndiaDevs/pwa"
+                                    target="_blank">https://github.com/MyPayIndiaDevs/pwa</a></li>
+                            <li>By using this service, you agree to the <a href="https://mypayindia.com/terms"
+                                    target="_blank">terms and conditions</a>, constituted by your initial registration
+                            </li>
                         </ul>
                         <div class="onboarding-actions">
                             <button class="primary big" id="onboardingContinueBtn" type="button">
