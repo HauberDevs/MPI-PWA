@@ -61,14 +61,6 @@ body {
   min-height: 100vh;
 }
 
-ul {
-  margin: 1rem 0;
-  padding-left: 1.2rem;
-  list-style: disc;
-  line-height: 1.45;
-  color: var(--text);
-}
-
 i {
   color: var(--icon);
   transition: color 0.25s;
@@ -598,12 +590,6 @@ body.dark .app-footer {
 
 .app-footer a:hover {
   opacity: 0.8;
-}
-
-
-a, a:hover, a:visited {
-  color: var(--accent);
-  text-decoration: underline;
 }
 
 

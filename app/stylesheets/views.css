@@ -237,6 +237,7 @@ body.dark .result-panel {
 .menu>.menu-link:first-of-type {
   margin-top: 0;
 }
+
 .grouped-link {
   margin-top: 0.65rem;
 }
@@ -299,6 +300,7 @@ body.dark .leaderboard li {
   gap: 0.4rem;
   text-decoration: none;
 }
+
 #ctaCard .cta-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -321,11 +323,27 @@ body.dark .leaderboard li {
   line-height: 1.5;
 }
 
+#onboardingCard ul {
+  margin: 1rem 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  line-height: 1.5;
+}
+
 .onboarding-actions {
   margin-top: 1.5rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+#onboardingCard a,
+#onboardingCard a:hover,
+#onboardingCard a:visited {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 #ctaCard .cta-buttons {
@@ -344,6 +362,3 @@ body.dark .leaderboard li {
   width: auto;
   flex: 1 1 180px;
 }
-
-
-
