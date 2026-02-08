@@ -31,6 +31,7 @@ const historyStatus = document.getElementById("historyStatus");
 const leaderboardList = document.getElementById("leaderboardList");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
 const displayUser = document.getElementById("displayUser");
+const userStatusLabel = document.getElementById("userStatusLabel");
 const userStatusName = document.getElementById("userStatusName");
 const userStatusPill = document.getElementById("userStatusPill");
 const balanceStatusValue = document.getElementById("balanceStatusValue");
@@ -314,14 +315,17 @@ function setRefreshTxnState(loading) {
 function setUserIdentity(name) {
   const trimmed = (name && `${name}`.trim()) || "";
   const hasIdentity = Boolean(trimmed);
-  const value = hasIdentity ? trimmed : "Guest";
-  if (displayUser) displayUser.textContent = value;
-  if (userStatusName) userStatusName.textContent = value;
+  const greetingName = hasIdentity ? trimmed : "Guest";
+  const pillLabel = hasIdentity ? "Logged in as" : "Not logged in";
+  const pillValue = hasIdentity ? trimmed : "";
+  if (displayUser) displayUser.textContent = greetingName;
+  if (userStatusLabel) userStatusLabel.textContent = pillLabel;
+  if (userStatusName) userStatusName.textContent = pillValue;
   if (userStatusPill) {
     userStatusPill.classList.toggle("user-pill-guest", !hasIdentity);
     userStatusPill.setAttribute(
       "aria-label",
-      hasIdentity ? `Logged in as ${value}` : "Go to the login page"
+      hasIdentity ? `Logged in as ${trimmed}` : "Go to the login page"
     );
   }
 }
