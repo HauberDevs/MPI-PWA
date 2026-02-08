@@ -7,7 +7,7 @@
     <title>MyPayIndia</title>
     <meta name="theme-color" content="#d03505" />
     <link rel="manifest" href="/manifest.json" />
-
+    <meta name="twitter:description" content="The future of online banking">
     <link rel="stylesheet" href="/app/stylesheets/fontawesome.css" />
     <link rel="stylesheet" href="/app/stylesheets/main.css" />
     <link rel="stylesheet" href="/app/stylesheets/views.css" />
@@ -78,6 +78,13 @@
                     <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
                         style="--fa-rotate-angle: 320deg;"></i>
                 </a>
+
+                <a class="menu-link grouped-link" href="https://mypayindia.com">
+                    <i class="fa-solid fa-house"></i>
+                    MyPayIndia.com
+                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                        style="--fa-rotate-angle: 320deg;"></i>
+                </a>
             </div>
 
             <div id="accountMenu" class="hidden">
@@ -103,7 +110,7 @@
                     Lookup link
                 </a>
 
-                <a class="menu-link route-link hidden" data-route data-dev-only
+                <a class="menu-link route-link hidden" data-dev-only
                     href="https://mypayindia.com/accountservices/moneygenerator/">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                     Money generator
@@ -111,22 +118,13 @@
                         style="--fa-rotate-angle: 320deg;"></i>
                 </a>
 
-                <a class="menu-link route-link hidden" data-route data-dev-only
+                <a class="menu-link route-link hidden" data-dev-only
                     href="https://mypayindia.com/accountservices/dashboard/">
                     <i class="fa-solid fa-house-chimney"></i>
                     Main dashboard
                     <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
                         style="--fa-rotate-angle: 320deg;"></i>
                 </a>
-
-                <a class="menu-link route-link hidden" data-route data-dev-only
-                    href="https://mypayindia.com">
-                    <i class="fa-solid fa-house"></i>
-                    MyPayIndia.com
-                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
-                        style="--fa-rotate-angle: 320deg;"></i>
-                </a>
-
             </div>
 
 
@@ -164,6 +162,14 @@
                 <i class="fa-solid fa-circle-exclamation"></i>
                 <span>You must log in first</span>
             </div>
+            <noscript>
+                <div class="login-warning" role="alert">
+                    <i class="fa-solid fa-ban fa-fade"></i>
+                    <span>JavaScript is disabled. Please enable it to continue. <a
+                            href="https://support.google.com/adsense/answer/12654?hl=en" target="_blank" class="muted">Learn
+                            how...</a></span>
+                </div>
+            </noscript>
             <div id="flowViews">
                 <section id="loginView" class="view">
                     <section class="card" id="loginCard">
@@ -275,7 +281,7 @@
                 <section id="transferView" class="view hidden">
                     <section class="card" id="transferCard">
                         <h2>
-                            <i class="fa-solid fa-paper-plane"></i>
+                            <i class="fa-solid fa-comment-dollar"></i>
                             Transfer
                         </h2>
                         <form id="transferForm" class="form-stack">
@@ -293,7 +299,7 @@
                 <section id="paymentLinkView" class="view hidden">
                     <section class="card" id="paymentLinkCard">
                         <h2>
-                            <i class="fa-solid fa-link"></i>
+                            <i class="fa-solid fa-comments-dollar"></i>
                             Create a payment link
                         </h2>
                         <form id="paymentLinkForm" class="form-stack">

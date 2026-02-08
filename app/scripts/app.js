@@ -573,7 +573,7 @@ function forceLogoutReset() {
 
 async function loadDashboard({ silent = false } = {}) {
   if (!silent && loginStatus) {
-    loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Retrieving data...</span>";
+    loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Checking if you are already logged in...</span>";
   }
 
   let info;
@@ -616,7 +616,7 @@ async function loadDashboard({ silent = false } = {}) {
 if (loginForm) {
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    loginStatus.innerHTML = '<i class="fa-solid fa-hourglass fa-spin"></i> Retrieving data...';
+    loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging in...</span>";
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
     const response = await apiLogin(username, password);
@@ -654,11 +654,6 @@ if (confirmLogoutBtn) {
     confirmLogoutBtn.disabled = true;
     confirmLogoutBtn.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging out...</span>";
     const cachebuster = Date.now().toString(36);
-    try {
-      await fetch(path + "/api/v1/logout", { method: "POST", credentials: "include" });
-    } catch (err) {
-      // ignore
-    }
     forceLogoutReset();
     const logoutUrl = `${ROUTE_PATHS.loginFlow}?cachebuster=${cachebuster}`;
     window.location.href = logoutUrl;

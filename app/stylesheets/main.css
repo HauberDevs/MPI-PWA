@@ -284,6 +284,7 @@ body.dark .menu-btn:hover {
   border-radius: 999px;
   background: #c9c9c9;
   transition: 0.2s;
+  cursor: pointer;
 }
 
 .slider:before {
