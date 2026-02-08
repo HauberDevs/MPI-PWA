@@ -79,5 +79,6 @@ async function apiGetPaymentLink(token) {
     { credentials: "include" }
   );
 
-  return res.json();
+  const data = await res.json();
+  return { status: res.status, ...data };
 }

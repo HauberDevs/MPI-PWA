@@ -200,7 +200,9 @@ function initQuickActions() {
     lookupLinkForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = new FormData(lookupLinkForm);
-      const token = (data.get("token") || "").trim();
+      const rawToken = (data.get("token") || "").trim();
+      const tokenMatch = rawToken.match(/token=([^&\s]+)/i);
+      const token = (tokenMatch ? tokenMatch[1] : rawToken.replace(/^https?:\/\/mypayindia\.com\/pay\/link\?token=/i, "")).trim();
       if (!token) {
         setStatus(lookupLinkStatus, "Enter a token", "error");
         return;
@@ -210,7 +212,16 @@ function initQuickActions() {
       try {
         const res = await apiGetPaymentLink(token);
         if (!res.success) {
-          setStatus(lookupLinkStatus, res.message || "Link not found", "error");
+          const errorMessages = {
+            400: "Missing token",
+            404: "This payment link does not exist",
+            410:
+              res.error === "already_claimed"
+                ? "This payment link has already been claimed"
+                : "This payment link has been retracted by the sender"
+          };
+          const errorMessage = errorMessages[res.status] || res.message || "Link not found";
+          setStatus(lookupLinkStatus, errorMessage, "error");
           return;
         }
         showLookupResult(res, token);
