@@ -16,6 +16,7 @@ const envLabel = document.getElementById("envLabel");
 
 const loginView = document.getElementById("loginView");
 const logoutView = document.getElementById("logoutView");
+const onboardingView = document.getElementById("onboardingView");
 const dashboardView = document.getElementById("dashboardView");
 const leaderboardView = document.getElementById("leaderboardView");
 const historyView = document.getElementById("historyView");
@@ -38,10 +39,12 @@ const balanceStatusValue = document.getElementById("balanceStatusValue");
 const displayBalance = document.getElementById("displayBalance");
 const ctaCard = document.getElementById("ctaCard");
 const installBtn = document.getElementById("installBtn");
+const onboardingContinueBtn = document.getElementById("onboardingContinueBtn");
 
 const routeViews = {
   loginFlow: loginView,
   logoutFlow: logoutView,
+  onboarding: onboardingView,
   dashboard: dashboardView,
   leaderboard: leaderboardView,
   history: historyView,
@@ -53,6 +56,7 @@ const routeViews = {
 const ROUTE_PATHS = {
   loginFlow: "/flow/login",
   logoutFlow: "/flow/logout",
+  onboarding: "/onboarding",
   dashboard: "/dashboard",
   leaderboard: "/leaderboard",
   history: "/history",
@@ -68,11 +72,13 @@ const ROUTE_TITLES = {
   paymentLink: "New payment link",
   loginFlow: "Log in to MyPayIndia",
   logoutFlow: "Log out",
+  onboarding: "Welcome to MyPayIndia",
   leaderboard: "Leaderboard",
   lookup: "Payment link info"
 };
 
 const AUTH_REQUIRED_ROUTES = new Set([
+  "onboarding",
   "dashboard",
   "history",
   "transfer",
@@ -89,6 +95,8 @@ const NAV_ROUTES = new Set([
   "paymentLink",
   "lookup"
 ]);
+
+const ONBOARDING_STORAGE_KEY = "acceptedOnboard";
 
 let deferredInstallPrompt = null;
 
@@ -139,6 +147,28 @@ let transactionsCache = [];
 let transactionsLoading = false;
 let leaderboardCache = null;
 let leaderboardLoading = false;
+
+function hasAcceptedOnboarding() {
+  try {
+    return window.localStorage.getItem(ONBOARDING_STORAGE_KEY) === "1";
+  } catch (err) {
+    return false;
+  }
+}
+
+function markOnboardingAccepted() {
+  try {
+    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
+  } catch (err) {
+    // ignore storage errors
+  }
+}
+
+function shouldForceOnboarding(route) {
+  if (!isLoggedIn) return false;
+  if (route === "onboarding" || route === "logoutFlow") return false;
+  return !hasAcceptedOnboarding();
+}
 
 function detectEnv() {
   if (!envLabel) return;
@@ -195,6 +225,7 @@ function resolveRoute(path) {
   if (path.startsWith("/transfer")) return "transfer";
   if (path.startsWith("/payment-link")) return "paymentLink";
   if (path.startsWith("/lookup-link")) return "lookup";
+  if (path.startsWith("/onboarding")) return "onboarding";
   if (path.startsWith("/dashboard")) return "dashboard";
   if (path === "/" || path === "/i" || path === "/") return "dashboard";
   return "dashboard";
@@ -483,6 +514,13 @@ function applyRoute(route) {
     }
   }
 
+  if (shouldForceOnboarding(key)) {
+    key = "onboarding";
+    if (window.location.pathname !== ROUTE_PATHS.onboarding) {
+      window.history.replaceState({}, "", ROUTE_PATHS.onboarding);
+    }
+  }
+
   Object.entries(routeViews).forEach(([name, view]) => {
     if (!view) return;
     view.classList.toggle("hidden", name !== key);
@@ -559,8 +597,17 @@ function deleteAllCookies() {
 function forceLogoutReset() {
   resetApplicationState();
   deleteAllCookies();
+  let onboardingAccepted = null;
+  try {
+    onboardingAccepted = window.localStorage.getItem(ONBOARDING_STORAGE_KEY);
+  } catch (err) {
+    onboardingAccepted = null;
+  }
   try {
     window.localStorage.clear();
+    if (onboardingAccepted === "1") {
+      window.localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
+    }
   } catch (err) {
     // ignore storage errors
   }
@@ -616,13 +663,14 @@ async function loadDashboard({ silent = false } = {}) {
 if (loginForm) {
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    loginStatus.classList.remove("status-error");
     loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging in...</span>";
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
     const response = await apiLogin(username, password);
 
     if (!response.success) {
-      loginStatus.textContent = response.message;
+      loginStatus.classList.add("status-error"); loginStatus.textContent = response.message;
       return;
     }
 
@@ -634,6 +682,13 @@ if (loginForm) {
       updateLoginRequiredNotice();
       navigate(ROUTE_PATHS[destination]);
     }
+  });
+}
+
+if (onboardingContinueBtn) {
+  onboardingContinueBtn.addEventListener("click", () => {
+    markOnboardingAccepted();
+    navigate(ROUTE_PATHS.dashboard);
   });
 }
 
