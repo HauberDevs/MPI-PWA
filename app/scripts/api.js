@@ -11,7 +11,7 @@ function guessServer() {
     return "https://mypayindia.com";
   }
 
-  return window.location.origin;
+  return "http://localhost:3000";
 }
 
 const path = guessServer();
