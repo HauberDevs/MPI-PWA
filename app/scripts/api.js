@@ -8,13 +8,13 @@ function guessServer() {
   }
 
   if (host.includes("app.mypayindia.com")) {
-    return "https://mypayindia.com";
+    return "https://pr.app.mypayindia.com";
   }
 
   return "http://localhost:3000";
 }
 
-const path = guessServer();
+const path = "https://pr.app.mypayindia.com";//guessServer();
 
 async function apiLogin(username, password) {
   const res = await fetch(path + "/api/v1/login", {
