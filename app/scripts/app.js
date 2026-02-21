@@ -23,6 +23,9 @@ const historyView = document.getElementById("historyView");
 const transferView = document.getElementById("transferView");
 const paymentLinkView = document.getElementById("paymentLinkView");
 const lookupView = document.getElementById("lookupView");
+const transactionView = document.getElementById("transactionView");
+const releaseNotesView = document.getElementById("releaseNotesView");
+const accountInfoView = document.getElementById("accountInfoView");
 
 const dashboardCard = document.getElementById("dashboardCard");
 const transactionsCard = document.getElementById("transactionsCard");
@@ -40,6 +43,29 @@ const displayBalance = document.getElementById("displayBalance");
 const ctaCard = document.getElementById("ctaCard");
 const installBtn = document.getElementById("installBtn");
 const onboardingContinueBtn = document.getElementById("onboardingContinueBtn");
+const transactionStatus = document.getElementById("transactionStatus");
+const transactionDetail = document.getElementById("transactionDetail");
+const transactionNumericIdValue = document.getElementById("transactionNumericIdValue");
+const transactionStatusValue = document.getElementById("transactionStatusValue");
+const transactionAmountValue = document.getElementById("transactionAmountValue");
+const transactionCreatedValue = document.getElementById("transactionCreatedValue");
+const transactionSenderValue = document.getElementById("transactionSenderValue");
+const transactionRecipientValue = document.getElementById("transactionRecipientValue");
+const transactionSenderIdValue = document.getElementById("transactionSenderIdValue");
+const transactionRecipientIdValue = document.getElementById("transactionRecipientIdValue");
+const transactionNoteValue = document.getElementById("transactionNoteValue");
+const transactionBackBtn = document.getElementById("transactionBackBtn");
+const accountInfoStatus = document.getElementById("accountInfoStatus");
+const accountInfoDetail = document.getElementById("accountInfoDetail");
+const accountInfoFields = {
+  username: document.getElementById("accountInfoUsername"),
+  firstName: document.getElementById("accountInfoFirstName"),
+  lastName: document.getElementById("accountInfoLastName"),
+  email: document.getElementById("accountInfoEmail"),
+  dob: document.getElementById("accountInfoDob"),
+  created: document.getElementById("accountInfoCreated"),
+  balance: document.getElementById("accountInfoBalance")
+};
 
 const routeViews = {
   loginFlow: loginView,
@@ -50,7 +76,10 @@ const routeViews = {
   history: historyView,
   transfer: transferView,
   paymentLink: paymentLinkView,
-  lookup: lookupView
+  lookup: lookupView,
+  transactionDetail: transactionView,
+  releaseNotes: releaseNotesView,
+  me: accountInfoView
 };
 
 const ROUTE_PATHS = {
@@ -62,7 +91,9 @@ const ROUTE_PATHS = {
   history: "/history",
   transfer: "/transfer",
   paymentLink: "/payment-link",
-  lookup: "/lookup-link"
+  lookup: "/lookup-link",
+  releaseNotes: "release_notes",
+  me: "/me"
 };
 
 const ROUTE_TITLES = {
@@ -74,7 +105,10 @@ const ROUTE_TITLES = {
   logoutFlow: "Log out",
   onboarding: "Welcome to MyPayIndia",
   leaderboard: "Leaderboard",
-  lookup: "Payment link info"
+  lookup: "Payment link info",
+  transactionDetail: "Transaction info",
+  releaseNotes: "Release notes",
+  me: "Account info"
 };
 
 const AUTH_REQUIRED_ROUTES = new Set([
@@ -83,6 +117,8 @@ const AUTH_REQUIRED_ROUTES = new Set([
   "history",
   "transfer",
   "paymentLink",
+  "me",
+  "transactionDetail",
   "logoutFlow"
 ]);
 
@@ -93,7 +129,8 @@ const NAV_ROUTES = new Set([
   "history",
   "transfer",
   "paymentLink",
-  "lookup"
+  "lookup",
+  "me"
 ]);
 
 const ONBOARDING_STORAGE_KEY = "acceptedOnboard";
@@ -147,6 +184,10 @@ let transactionsCache = [];
 let transactionsLoading = false;
 let leaderboardCache = null;
 let leaderboardLoading = false;
+let currentTransactionDetailId = null;
+let transactionDetailLoading = false;
+let transactionDetailRequestToken = 0;
+let accountInfoCache = null;
 
 function hasAcceptedOnboarding() {
   try {
@@ -191,6 +232,18 @@ function formatCurrency(value) {
   }).format(amount);
 }
 
+function formatDateOnly(value) {
+  if (!value) return "";
+  const normalized = value.includes("T") ? value : `${value}T00:00:00Z`;
+  const date = new Date(normalized);
+  if (Number.isNaN(date.valueOf())) return value;
+  return new Intl.DateTimeFormat(undefined, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).format(date);
+}
+
 function formatTxnDate(value) {
   if (!value) return "";
   const isoCandidate = value.replace(" ", "T") + "Z";
@@ -225,6 +278,9 @@ function resolveRoute(path) {
   if (path.startsWith("/transfer")) return "transfer";
   if (path.startsWith("/payment-link")) return "paymentLink";
   if (path.startsWith("/lookup-link")) return "lookup";
+  if (path.startsWith("/transaction/")) return "transactionDetail";
+  if (path.startsWith("release_notes")) return "releaseNotes";
+  if (path.startsWith("/me")) return "me";
   if (path.startsWith("/onboarding")) return "onboarding";
   if (path.startsWith("/dashboard")) return "dashboard";
   if (path === "/" || path === "/i" || path === "/") return "dashboard";
@@ -242,6 +298,52 @@ function setActiveRouteLinks(active) {
     const target = resolveRoute(link.getAttribute("href"));
     link.classList.toggle("active", active === target);
   });
+}
+
+function buildTransactionPath(transactionId) {
+  if (!transactionId) return "/history";
+  return `/transaction/${encodeURIComponent(transactionId)}`;
+}
+
+function extractTransactionIdFromPath(path) {
+  if (!path) return null;
+  const match = path.match(/^\/transaction\/([^/]+)$/i);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch (err) {
+    return match[1];
+  }
+}
+
+function navigateToTransaction(transactionId) {
+  if (!transactionId) return;
+  if (!isLoggedIn) {
+    navigate(ROUTE_PATHS.loginFlow);
+    return;
+  }
+  navigate(buildTransactionPath(transactionId));
+}
+
+function attachTransactionRowHandlers(row, txn) {
+  if (!row || !txn || !txn.transaction_id) return;
+  const { transaction_id: transactionId } = txn;
+  row.dataset.transactionId = transactionId;
+  row.classList.add("transaction-clickable");
+  row.setAttribute("role", "button");
+  row.setAttribute("tabindex", "0");
+  row.setAttribute("aria-label", `View transaction ${transactionId}`);
+  row.title = "View transaction details";
+
+  const handleClick = () => navigateToTransaction(transactionId);
+  const handleKey = (event) => {
+    if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+    event.preventDefault();
+    navigateToTransaction(transactionId);
+  };
+
+  row.addEventListener("click", handleClick);
+  row.addEventListener("keydown", handleKey);
 }
 
 function renderRecentTransactions(list) {
@@ -275,6 +377,7 @@ function renderRecentTransactions(list) {
       <span class="status ${statusClass}">${txn.status}</span>
       <span class="txn-date">${formatTxnDate(txn.created)}</span>
     `;
+    attachTransactionRowHandlers(row, txn);
     txnList.appendChild(row);
   });
 }
@@ -319,8 +422,187 @@ function renderHistory() {
       <span class="status ${statusClass}">${txn.status}</span>
       <span class="txn-date">${formatTxnDate(txn.created)}</span>
     `;
+    attachTransactionRowHandlers(row, txn);
     historyList.appendChild(row);
   });
+}
+
+function renderAccountInfo() {
+  if (!accountInfoStatus || !accountInfoDetail) return;
+
+  if (!isLoggedIn) {
+    accountInfoDetail.classList.add("hidden");
+    accountInfoStatus.innerHTML = "<span class='fa-fade'>You must log in first!</span>";
+    return;
+  }
+
+  if (!accountInfoCache) {
+    accountInfoDetail.classList.add("hidden");
+    accountInfoStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Loading account info...</span>";
+    return;
+  }
+
+  accountInfoDetail.classList.remove("hidden");
+
+  const {
+    username,
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    date_of_birth: dateOfBirth,
+    created,
+    balance
+  } = accountInfoCache;
+
+  if (accountInfoFields.username) accountInfoFields.username.textContent = username || "-";
+  if (accountInfoFields.firstName) accountInfoFields.firstName.textContent = firstName || "-";
+  if (accountInfoFields.lastName) accountInfoFields.lastName.textContent = lastName || "-";
+  if (accountInfoFields.email) accountInfoFields.email.textContent = email || "-";
+  if (accountInfoFields.dob) {
+    const dobText = formatDateOnly(dateOfBirth) || dateOfBirth || "-";
+    accountInfoFields.dob.textContent = dobText;
+  }
+  if (accountInfoFields.created) {
+    const createdText = formatTxnDate(created) || created || "-";
+    accountInfoFields.created.textContent = createdText;
+  }
+  if (accountInfoFields.balance) {
+    accountInfoFields.balance.textContent = formatCurrency(balance);
+  }
+}
+
+function setAccountInfo(info) {
+  accountInfoCache = info || null;
+  if (currentRoute === "me") {
+    renderAccountInfo();
+  }
+}
+
+function updateTransactionDetailTitle(transactionId) {
+  if (currentRoute !== "transactionDetail") return;
+  const base = transactionId ? `${transactionId}` : ROUTE_TITLES.transactionDetail;
+  document.title = `${base} / MyPayIndia`;
+}
+
+function setTransactionDetailMessage(message, { isError = false, allowHtml = false } = {}) {
+  if (!transactionStatus) return;
+  transactionStatus.classList.toggle("status-error", Boolean(isError));
+  if (allowHtml) {
+    transactionStatus.innerHTML = message;
+  } else {
+    transactionStatus.textContent = message;
+  }
+}
+
+function resetTransactionDetailView(message = "") {
+  currentTransactionDetailId = null;
+  transactionDetailLoading = false;
+  if (transactionDetail) transactionDetail.classList.add("hidden");
+  setTransactionDetailMessage(message, { isError: false });
+
+  const placeholders = [
+    transactionNumericIdValue,
+    transactionStatusValue,
+    transactionAmountValue,
+    transactionCreatedValue,
+    transactionSenderValue,
+    transactionRecipientValue,
+    transactionSenderIdValue,
+    transactionRecipientIdValue,
+    transactionNoteValue
+  ];
+  placeholders.forEach((el) => {
+    if (!el) return;
+    el.textContent = "-";
+  });
+  if (transactionStatusValue) {
+    transactionStatusValue.classList.remove("ok", "bad");
+  }
+
+  updateTransactionDetailTitle(null);
+}
+
+function renderTransactionDetail(data) {
+  if (!data || !transactionDetail) return;
+  transactionDetailLoading = false;
+  setTransactionDetailMessage("", { isError: false });
+  transactionDetail.classList.remove("hidden");
+
+  const {
+    transaction_id: txnId,
+    status,
+    amount,
+    created,
+    sender_name: senderName,
+    target_name: recipientName,
+    sender_id: senderId,
+    target_id: recipientId,
+    note
+  } = data;
+
+  currentTransactionDetailId = txnId || null;
+
+  if (transactionNumericIdValue) {
+    transactionNumericIdValue.textContent = data.id ?? "-";
+  }
+  if (transactionStatusValue) {
+    transactionStatusValue.textContent = status || "-";
+    const normalized = (status || "").toLowerCase();
+    transactionStatusValue.classList.toggle("ok", normalized === "confirmed");
+    transactionStatusValue.classList.toggle("bad", normalized !== "confirmed" && Boolean(status));
+  }
+  if (transactionAmountValue) transactionAmountValue.textContent = formatCurrency(amount);
+  if (transactionCreatedValue) transactionCreatedValue.textContent = formatTxnDate(created) || "-";
+  if (transactionSenderValue) transactionSenderValue.textContent = senderName || "Unknown";
+  if (transactionRecipientValue) transactionRecipientValue.textContent = recipientName || "Unknown";
+  if (transactionSenderIdValue) transactionSenderIdValue.textContent = senderId ?? "-";
+  if (transactionRecipientIdValue) transactionRecipientIdValue.textContent = recipientId ?? "-";
+  if (transactionNoteValue) transactionNoteValue.textContent = note || "No note";
+
+  const transactionLabel = txnId ? ` ${txnId}` : "Transaction";
+  updateTransactionDetailTitle(txnId || null);
+  if (transactionStatus) {
+    transactionStatus.textContent = transactionLabel;
+    transactionStatus.classList.remove("status-error");
+  }
+}
+
+async function loadTransactionDetail(transactionId) {
+  if (!transactionStatus) return;
+  currentTransactionDetailId = transactionId;
+  transactionDetailLoading = true;
+  const requestToken = ++transactionDetailRequestToken;
+  setTransactionDetailMessage(
+    "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Retrieving data...</span>",
+    { isError: false, allowHtml: true }
+  );
+  if (transactionDetail) transactionDetail.classList.add("hidden");
+
+  try {
+    const response = await apiTransactionDetail(transactionId);
+    if (requestToken !== transactionDetailRequestToken) return;
+    if (!response.success) {
+      resetTransactionDetailView(response.message || "Unable to load transaction.");
+      transactionStatus?.classList.add("status-error");
+      return;
+    }
+    renderTransactionDetail(response);
+  } catch (err) {
+    if (requestToken !== transactionDetailRequestToken) return;
+    resetTransactionDetailView("Unable to load transaction.");
+    transactionStatus?.classList.add("status-error");
+  }
+}
+
+function loadTransactionDetailFromLocation() {
+  const transactionId = extractTransactionIdFromPath(window.location.pathname);
+  if (!transactionId) {
+    resetTransactionDetailView("No transaction ID specified!");
+    transactionStatus?.classList.add("status-error");
+    return;
+  }
+  transactionStatus?.classList.remove("status-error");
+  loadTransactionDetail(transactionId);
 }
 
 function updateTransactions(data) {
@@ -354,10 +636,10 @@ function setUserIdentity(name) {
   if (userStatusName) userStatusName.textContent = pillValue;
   if (userStatusPill) {
     userStatusPill.classList.toggle("user-pill-guest", !hasIdentity);
-    userStatusPill.setAttribute(
-      "aria-label",
-      hasIdentity ? `Logged in as ${trimmed}` : "Go to the login page"
-    );
+    const ariaLabel = hasIdentity
+      ? `View account information for ${trimmed}`
+      : "Go to the login page";
+    userStatusPill.setAttribute("aria-label", ariaLabel);
   }
 }
 
@@ -379,6 +661,7 @@ function resetApplicationState() {
   transactionsLoading = false;
   leaderboardCache = null;
   leaderboardLoading = false;
+  accountInfoCache = null;
   if (accountMenu) accountMenu.classList.add("hidden");
   if (logoutBtn) logoutBtn.classList.add("hidden");
   if (dashboardCard) dashboardCard.classList.add("hidden");
@@ -388,6 +671,8 @@ function resetApplicationState() {
   if (ctaCard) ctaCard.classList.add("hidden");
   renderRecentTransactions([]);
   renderHistory();
+  renderAccountInfo();
+  resetTransactionDetailView("Select a transaction to view the details.");
   if (leaderboardList) leaderboardList.innerHTML = "";
   if (leaderboardStatus) leaderboardStatus.textContent = "";
   setUserIdentity("");
@@ -537,6 +822,14 @@ function applyRoute(route) {
   if (key === "history") {
     renderHistory();
   }
+
+  if (key === "me") {
+    renderAccountInfo();
+  }
+
+  if (key === "transactionDetail") {
+    loadTransactionDetailFromLocation();
+  }
 }
 
 function navigate(path, { replace = false } = {}) {
@@ -568,17 +861,22 @@ routeLinks.forEach((link) => {
 });
 
 if (userStatusPill) {
-  const handleUserPillAction = (event) => {
-    if (isLoggedIn) return;
-    if (event.type === "keydown") {
-      const key = event.key;
-      if (!["Enter", " ", "Spacebar", "Space"].includes(key)) return;
+  const navigateToAccountInfo = () => {
+    const targetRouteKey = "me";
+    if (ensureAuthenticatedAction(targetRouteKey)) {
+      navigate(ROUTE_PATHS[targetRouteKey]);
     }
-    event.preventDefault();
-    navigate(ROUTE_PATHS.loginFlow);
   };
-  userStatusPill.addEventListener("click", handleUserPillAction);
-  userStatusPill.addEventListener("keydown", handleUserPillAction);
+  userStatusPill.addEventListener("click", (event) => {
+    event.preventDefault();
+    navigateToAccountInfo();
+  });
+  userStatusPill.addEventListener("keydown", (event) => {
+    const key = event.key;
+    if (![" ", "Spacebar", "Space"].includes(key)) return;
+    event.preventDefault();
+    navigateToAccountInfo();
+  });
 }
 
 function deleteAllCookies() {
@@ -650,6 +948,7 @@ async function loadDashboard({ silent = false } = {}) {
 
   setUserIdentity(info.username || "");
   setBalanceDisplay(info.balance);
+  setAccountInfo(info);
 
   await loadTransactions({ showErrors: true });
 
@@ -727,6 +1026,12 @@ if (refreshHistoryBtn) {
   });
 }
 
+if (transactionBackBtn) {
+  transactionBackBtn.addEventListener("click", () => {
+    navigate(ROUTE_PATHS.history);
+  });
+}
+
 window.addEventListener("load", () => {
   applyRoute(resolveRoute(window.location.pathname));
 });
@@ -752,18 +1057,3 @@ window.MyPayApp = {
 };
 
 loadDashboard();
-
-
-
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/sw.js")
-      .catch((err) => console.error("SW registration failed", err));
-  });
-}
-
-
-
-

@@ -11,10 +11,10 @@ function guessServer() {
     return "https://pr.app.mypayindia.com";
   }
 
-  return "http://localhost:3000";
+  else return "http://localhost:3000";
 }
 
-const path = "https://pr.app.mypayindia.com";//guessServer();
+const path = guessServer();
 
 async function apiLogin(username, password) {
   const res = await fetch(path + "/api/v1/login", {
@@ -38,6 +38,22 @@ async function apiInfo() {
 async function apiTransactions() {
   const res = await fetch(path + "/api/v1/transaction_history", {
     credentials: "include"
+  });
+
+  return res.json();
+}
+
+async function apiTransactionDetail(transactionId) {
+  const payload =
+    transactionId && /^\d+$/.test(String(transactionId))
+      ? { id: Number(transactionId) }
+      : { transaction_id: transactionId };
+
+  const res = await fetch(path + "/api/v1/transaction", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload)
   });
 
   return res.json();
