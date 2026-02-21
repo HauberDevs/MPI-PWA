@@ -97,7 +97,7 @@
                 </a>
                 <a class="menu-link grouped-link" href="https://mypayindia.com/docs/">
                     <i class="fa-solid fa-book"></i>
-                    Documentation
+                    API docs
                     <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
                         style="--fa-rotate-angle: 320deg;"></i>
                 </a>
@@ -107,6 +107,12 @@
                     MyPayIndia.com
                     <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
                         style="--fa-rotate-angle: 320deg;"></i>
+                </a>
+
+                <a class="menu-link route-link" data-route href="release_notes"
+                    id="releaseNotesLink">
+                    <i class="fa-solid fa-scroll"></i>
+                    App release notes
                 </a>
             </div>
 
@@ -136,12 +142,6 @@
                 <a class="menu-link route-link hidden" data-route data-dev-only href="/lookup-link">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     Lookup link
-                </a>
-
-                <a class="menu-link route-link hidden" data-route data-dev-only href="release_notes"
-                    id="releaseNotesLink">
-                    <i class="fa-solid fa-scroll"></i>
-                    Release notes
                 </a>
 
                 <a class="menu-link route-link hidden" data-dev-only
@@ -189,7 +189,7 @@
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Log out
             </a>
-            
+
             <!-- credits -->
             <div class="credits noselect muted">
                 App by <a href="https://exerinity.com" target="_blank">exerinity</a>
@@ -430,7 +430,9 @@
                         <h3>Version 1</h3>
                         <p class="muted">14th Feb 2026</p>
                         <ul>
-                            <li>App launches to <a href="https://app.mypayindia.com" onclick="event.preventDefault();">app.mypayindia.com</a></li> <!-- because you're already here -->
+                            <li>App launches to <a href="https://app.mypayindia.com"
+                                    onclick="event.preventDefault();">app.mypayindia.com</a></li>
+                            <!-- because you're already here -->
                         </ul>
                         <h3>Version 0 (pre-release)</h3>
                         <p class="muted">7th Feb 2026</p>
@@ -543,7 +545,8 @@
         </main>
 
         <footer class="app-footer noselect">
-            <a class="route-link" data-route href="release_notes">v2</a> - environment: <strong id="envLabel">..</strong>
+            <a class="route-link" data-route href="release_notes">v2</a> - environment: <strong
+                id="envLabel">..</strong>
         </footer>
     </div>
     <script src="/app/scripts/menu.js"></script>
