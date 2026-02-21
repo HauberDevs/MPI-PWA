@@ -124,6 +124,22 @@ body.dark .lookup-result {
   text-decoration: none;
 }
 
+.embedded-frame-panel {
+  margin-top: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.embedded-frame {
+  display: block;
+  width: 100%;
+  min-height: 18vh;
+  border: 0;
+  background: transparent;
+}
+
 .status-success {
   color: #0a7d38;
 }

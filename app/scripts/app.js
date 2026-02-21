@@ -26,6 +26,7 @@ const lookupView = document.getElementById("lookupView");
 const transactionView = document.getElementById("transactionView");
 const releaseNotesView = document.getElementById("releaseNotesView");
 const accountInfoView = document.getElementById("accountInfoView");
+const moneyGeneratorView = document.getElementById("moneyGeneratorView");
 
 const dashboardCard = document.getElementById("dashboardCard");
 const transactionsCard = document.getElementById("transactionsCard");
@@ -77,6 +78,7 @@ const routeViews = {
   transfer: transferView,
   paymentLink: paymentLinkView,
   lookup: lookupView,
+  moneyGenerator: moneyGeneratorView,
   transactionDetail: transactionView,
   releaseNotes: releaseNotesView,
   me: accountInfoView
@@ -93,7 +95,8 @@ const ROUTE_PATHS = {
   paymentLink: "/payment-link",
   lookup: "/lookup-link",
   releaseNotes: "release_notes",
-  me: "/me"
+  me: "/me",
+  moneyGenerator: "/money-generator"
 };
 
 const ROUTE_TITLES = {
@@ -106,6 +109,7 @@ const ROUTE_TITLES = {
   onboarding: "Welcome to MyPayIndia",
   leaderboard: "Leaderboard",
   lookup: "Payment link info",
+  moneyGenerator: "Money generator",
   transactionDetail: "Transaction info",
   releaseNotes: "Release notes",
   me: "Account info"
@@ -117,6 +121,7 @@ const AUTH_REQUIRED_ROUTES = new Set([
   "history",
   "transfer",
   "paymentLink",
+  "moneyGenerator",
   "me",
   "transactionDetail",
   "logoutFlow"
@@ -130,6 +135,7 @@ const NAV_ROUTES = new Set([
   "transfer",
   "paymentLink",
   "lookup",
+  "moneyGenerator",
   "me"
 ]);
 
@@ -278,6 +284,7 @@ function resolveRoute(path) {
   if (path.startsWith("/transfer")) return "transfer";
   if (path.startsWith("/payment-link")) return "paymentLink";
   if (path.startsWith("/lookup-link")) return "lookup";
+  if (path.startsWith("/money-generator")) return "moneyGenerator";
   if (path.startsWith("/transaction/")) return "transactionDetail";
   if (path.startsWith("release_notes")) return "releaseNotes";
   if (path.startsWith("/me")) return "me";

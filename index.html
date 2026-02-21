@@ -109,8 +109,7 @@
                         style="--fa-rotate-angle: 320deg;"></i>
                 </a>
 
-                <a class="menu-link route-link" data-route href="release_notes"
-                    id="releaseNotesLink">
+                <a class="menu-link route-link" data-route href="release_notes" id="releaseNotesLink">
                     <i class="fa-solid fa-scroll"></i>
                     App release notes
                 </a>
@@ -139,18 +138,16 @@
                     Create payment link
                 </a>
 
+                <a class="menu-link route-link" data-route href="/money-generator">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    Money generator
+                </a>
+
                 <a class="menu-link route-link hidden" data-route data-dev-only href="/lookup-link">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     Lookup link
                 </a>
 
-                <a class="menu-link route-link hidden" data-dev-only
-                    href="https://mypayindia.com/accountservices/moneygenerator">
-                    <i class="fa-solid fa-indian-rupee-sign"></i>
-                    Money generator
-                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
-                        style="--fa-rotate-angle: 320deg;"></i>
-                </a>
 
                 <a class="menu-link route-link hidden" data-dev-only
                     href="https://mypayindia.com/accountservices/dashboard">
@@ -413,14 +410,36 @@
                     </section>
                 </section>
 
+                <section id="moneyGeneratorView" class="view hidden">
+                    <section class="card" id="moneyGeneratorCard">
+                        <h2>
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            MyPayIndia's money generator
+                        </h2>
+                        <p class="muted">Wanna get funds? No worries, the money generator has you covered! No money is
+                            free though. You have to prove to the Intelligence Identifier that you're worthy.
+                        </p>
+                        <div class="embedded-frame-panel">
+                            <iframe class="embedded-frame" title="Money generator"
+                                src="https://mypayindia.com/accountservices/moneygenerator/?minimal=1" loading="lazy"
+                                referrerpolicy="no-referrer"></iframe>
+                        </div>
+                    </section>
+                </section>
+
                 <section id="releaseNotesView" class="view hidden">
                     <section class="card onboarding-card" id="releaseNotesCard">
                         <h2>
                             <i class="fa-solid fa-scroll"></i>
                             Release notes
                         </h2>
-                        <h3>Version 2</h3>
+                        <h3>Version 2a</h3>
                         <p class="muted">21st Feb 2026</p>
+                        <ul>
+                            <li>Moved App release notes from <strong>Your account</strong> to <strong>Meta</strong> in the menu</li>
+                            <li>Added the money generator</li>
+                        </ul>
+                        <h3>Version 2</h3>
                         <ul>
                             <li>Added a new transaction details view, click on a transaction on the dashboard or bespoke
                                 list! (/history)</li>
@@ -545,7 +564,7 @@
         </main>
 
         <footer class="app-footer noselect">
-            <a class="route-link" data-route href="release_notes">v2</a> - environment: <strong
+            <a class="route-link" data-route href="release_notes">v2a</a> - environment: <strong
                 id="envLabel">..</strong>
         </footer>
     </div>
