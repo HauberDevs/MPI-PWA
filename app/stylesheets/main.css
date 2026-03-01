@@ -164,6 +164,17 @@ body.dark .menu-btn:hover {
   color: inherit;
 }
 
+.balance-pill {
+  text-decoration: none;
+  color: inherit;
+}
+
+.balance-pill:visited,
+.balance-pill:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
 .user-pill i,
 .balance-pill i {
   font-size: 1.1rem;
