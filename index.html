@@ -53,13 +53,14 @@
                         <span class="user-pill-username" id="userStatusName">...</span>
                     </div>
                 </a>
-                <div class="balance-pill" id="balanceStatusPill" aria-live="polite">
+                <a class="balance-pill" id="balanceStatusPill" aria-live="polite" title="Get more money!"
+                    href="https://mypayindia.com/accountservices/moneygenerator" target="_blank" rel="noopener">
                     <i class="fa-solid fa-wallet"></i>
                     <div class="balance-pill-text">
                         <span class="balance-pill-label">Balance</span>
                         <span class="balance-pill-value" id="balanceStatusValue">&#8377;0.00</span>
                     </div>
-                </div>
+                </a>
                 <button class="menu-btn" id="menuBtn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
@@ -138,9 +139,16 @@
                     Create payment link
                 </a>
 
-                <a class="menu-link route-link" data-route href="/money-generator">
+                <a class="menu-link route-link" data-route href="/settings">
+                    <i class="fa-solid fa-gear"></i>
+                    Settings
+                </a>
+
+                <a class="menu-link grouped-link" href="https://mypayindia.com/accountservices/moneygenerator">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                     Money generator
+                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
+                        style="--fa-rotate-angle: 320deg;"></i>
                 </a>
 
                 <a class="menu-link route-link hidden" data-route data-dev-only href="/lookup-link">
@@ -263,6 +271,7 @@
                             <li>By using this service, you agree to the <a href="https://mypayindia.com/terms"
                                     target="_blank">terms and conditions</a>, constituted by your initial registration
                             </li>
+                            <li><strong>This app is not complete and still an early work in progress</strong></li>
                         </ul>
                         <div class="onboarding-actions">
                             <button class="primary big" id="onboardingContinueBtn" type="button">
@@ -286,10 +295,10 @@
                     </section>
 
                     <section class="card hidden" id="ctaCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-arrow-right"></i>
                             Quick actions
-                        </h2>
+                        </h1>
                         <div class="cta-buttons">
                             <a class="primary route-link cta-btn" data-route href="/transfer">
                                 <i class="fa-solid fa-comment-dollar"></i>
@@ -303,10 +312,10 @@
                     </section>
                     <section class="card hidden" id="transactionsCard">
                         <div class="card-heading">
-                            <h2>
+                            <h1>
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 Recent activity
-                            </h2>
+                            </h1>
                             <button class="icon-btn hidden" id="refreshTxnBtn" type="button"
                                 title="Refresh transactions">
                                 <i class="fa-solid fa-rotate-right"></i>
@@ -319,12 +328,43 @@
                     </section>
                 </section>
 
+                <section id="settingsView" class="view hidden">
+                    <section class="card" id="settingsCard">
+                        <h1>
+                            <i class="fa-solid fa-gear"></i>
+                            Settings
+                        </h1>
+                        <form id="settingsForm" class="form-stack">
+                            <fieldset class="form-group">
+                                <legend class="toggle-label"><i class="fa-regular fa-id-badge"></i> Use for display
+                                </legend>
+                                <p class="muted" id="displayPrefHelp">Change what is shown on the homepage and the
+                                    "Logged in as" pill</p>
+                                <div class="radio-group" role="radiogroup" aria-describedby="displayPrefHelp">
+
+                                    <div class="radio-item">
+                                        <input type="radio" name="displayNameMode" value="username"
+                                            id="displayPrefUsername">
+                                        <label for="displayPrefUsername">Username</label>
+                                    </div>
+
+                                    <div class="radio-item">
+                                        <input type="radio" name="displayNameMode" value="full" id="displayPrefFull">
+                                        <label for="displayPrefFull">Real name</label>
+                                    </div>
+
+                                </div>
+                            </fieldset>
+                        </form>
+                    </section>
+                </section>
+
                 <section id="leaderboardView" class="view hidden">
                     <section class="card" id="leaderboardCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-trophy"></i>
                             Leaderboard
-                        </h2>
+                        </h1>
                         <ol id="leaderboardList" class="leaderboard"></ol>
                         <p class="muted fa-fade" id="leaderboardStatus">Retrieving data...</p>
                     </section>
@@ -333,10 +373,10 @@
                 <section id="historyView" class="view hidden">
                     <section class="card" id="historyCard">
                         <div class="card-heading">
-                            <h2>
+                            <h1>
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 Transactions
-                            </h2>
+                            </h1>
                             <button class="icon-btn hidden" id="refreshHistoryBtn" type="button"
                                 title="Refresh history">
                                 <i class="fa-solid fa-rotate-right"></i>
@@ -349,10 +389,10 @@
 
                 <section id="transferView" class="view hidden">
                     <section class="card" id="transferCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-comment-dollar"></i>
                             Transfer
-                        </h2>
+                        </h1>
                         <form id="transferForm" class="form-stack">
                             <p class="muted"><strong>Keep in mind</strong>: transfers above a certain amount are subject
                                 to manual review by our team.</p>
@@ -360,22 +400,22 @@
                             <input type="text" name="recipient" placeholder="To who?" required />
                             <input type="text" name="note" placeholder="An optional note?" />
                             <button class="primary" type="submit">Send it!</button>
-                            <p class="muted form-status" id="transferStatus">Standby...</p>
+                            <p class="muted form-status" id="transferStatus"></p>
                         </form>
                     </section>
                 </section>
 
                 <section id="paymentLinkView" class="view hidden">
                     <section class="card" id="paymentLinkCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-comments-dollar"></i>
                             Create a payment link
-                        </h2>
+                        </h1>
                         <form id="paymentLinkForm" class="form-stack">
                             <input type="number" min="0" step="0.01" name="amount" placeholder="How much?" required />
                             <input type="text" name="note" placeholder="An optional note?" />
                             <button class="primary" type="submit">Create</button>
-                            <p class="muted form-status" id="paymentLinkStatus">Standby...</p>
+                            <p class="muted form-status" id="paymentLinkStatus"></p>
                         </form>
                         <div class="result-panel hidden" id="paymentLinkResult">
                             <p class="result-text" id="paymentLinkResultText"></p>
@@ -389,15 +429,14 @@
 
                 <section id="lookupView" class="view hidden">
                     <section class="card" id="lookupCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-magnifying-glass"></i>
                             Lookup payment link
-                        </h2>
+                        </h1>
                         <form id="lookupLinkForm" class="form-stack">
-                            <input type="text" name="token" placeholder="The link, sans mypayindia.com/pay/link?token="
-                                required />
+                            <input type="text" name="token" required />
                             <button class="secondary" type="submit">Look it up!</button>
-                            <p class="muted form-status" id="lookupLinkStatus">Standby...</p>
+                            <p class="muted form-status" id="lookupLinkStatus"></p>
                         </form>
                         <div class="lookup-result hidden" id="lookupResult" aria-live="polite">
                             <p class="lookup-amount" id="lookupAmount">₹0.00</p>
@@ -409,66 +448,83 @@
                         </div>
                     </section>
                 </section>
-
-                <section id="moneyGeneratorView" class="view hidden">
-                    <section class="card" id="moneyGeneratorCard">
-                        <h2>
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
-                            MyPayIndia's money generator
-                        </h2>
-                        <p class="muted">Wanna get funds? No worries, the money generator has you covered! No money is
-                            free though. You have to prove to the Intelligence Identifier that you're worthy.
-                        </p>
-                        <div class="embedded-frame-panel">
-                            <iframe class="embedded-frame" title="Money generator"
-                                src="https://pr.app.mypayindia.com/accountservices/moneygenerator/?minimal=1" loading="lazy"
-                                referrerpolicy="no-referrer"></iframe>
-                        </div>
-                    </section>
-                </section>
-
                 <section id="releaseNotesView" class="view hidden">
                     <section class="card onboarding-card" id="releaseNotesCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-scroll"></i>
                             Release notes
-                        </h2>
-                        <h3>Version 2a</h3>
-                        <p class="muted">21st Feb 2026</p>
-                        <ul>
-                            <li>Moved App release notes from <strong>Your account</strong> to <strong>Meta</strong> in the menu</li>
-                            <li>Added the money generator</li>
-                        </ul>
-                        <h3>Version 2</h3>
-                        <ul>
-                            <li>Added a new transaction details view, click on a transaction on the dashboard or bespoke
-                                list! (/history)</li>
-                            <li>Added a new account information view, accessible from the menu or when clicking on the
-                                username in the topbar! (/me)</li>
-                        </ul>
-                        <h3>Version 1</h3>
-                        <p class="muted">14th Feb 2026</p>
-                        <ul>
-                            <li>App launches to <a href="https://app.mypayindia.com"
-                                    onclick="event.preventDefault();">app.mypayindia.com</a></li>
-                            <!-- because you're already here -->
-                        </ul>
-                        <h3>Version 0 (pre-release)</h3>
-                        <p class="muted">7th Feb 2026</p>
-                        <ul>
-                            <li>App inception</li>
-                            <li>Added a leaderboard, login flow, payment link creator, transaction history, and a basic
-                                dashboard</li>
-                        </ul>
+                        </h1>
+                        <details>
+                            <summary>
+                                <h3>Version 3</h3>
+                            </summary>
+                            <p class="muted">1 Mar 2026</p>
+                            <ul>
+                                <li>Added a new <a class="route-link" data-route href="/settings">Settings view</a>
+                                    accessible in the menu that, as of now, allows you to change your display name in
+                                    the app from real name or username</li>
+                                <li>Removed the money generator view, it didn't work</li>
+                                <li>Updated some styling to look better, and also, the onboarding message</li>
+                            </ul>
+                        </details>
+
+                        <details>
+                            <summary>
+                                <h3>Version 2a</h3>
+                            </summary>
+                            <p class="muted">21st Feb 2026</p>
+                            <ul>
+                                <li>Moved <a class="route-link" data-route href="release_notes">App release notes</a>
+                                    from <strong>Your account</strong> to <strong>Meta</strong> in the menu</li>
+                                <li>Added the money generator</li>
+                            </ul>
+                        </details>
+
+                        <details>
+                            <summary>
+                                <h3>Version 2</h3>
+                            </summary>
+                            <ul>
+                                <li>Added a new transaction details view, click on a transaction on the dashboard or
+                                    bespoke list! (/history)</li>
+                                <li>Added a new <a class="route-link" data-route href="/me">account information
+                                        view</a>, accessible from the menu or when clicking on the username in the
+                                    topbar!</li>
+                            </ul>
+                        </details>
+
+                        <details>
+                            <summary>
+                                <h3>Version 1</h3>
+                            </summary>
+                            <p class="muted">14th Feb 2026</p>
+                            <ul>
+                                <li>App launches to <a href="https://app.mypayindia.com"
+                                        onclick="event.preventDefault();">app.mypayindia.com</a></li>
+                                <!-- because you're already here -->
+                            </ul>
+                        </details>
+
+                        <details>
+                            <summary>
+                                <h3>Version 0 (pre-release)</h3>
+                            </summary>
+                            <p class="muted">7th Feb 2026</p>
+                            <ul>
+                                <li>App inception</li>
+                                <li>Added a leaderboard, login flow, payment link creator, transaction history, and a
+                                    basic dashboard</li>
+                            </ul>
+                        </details>
                     </section>
                 </section>
 
                 <section id="transactionView" class="view hidden">
                     <section class="card" id="transactionCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-receipt"></i>
                             Transaction details
-                        </h2>
+                        </h1>
                         <p class="muted form-status" id="transactionStatus"></p>
                         <div id="transactionDetail" class="txn-detail hidden">
                             <ul class="txn-detail-list">
@@ -519,10 +575,10 @@
 
                 <section id="accountInfoView" class="view hidden">
                     <section class="card" id="accountInfoCard">
-                        <h2>
+                        <h1>
                             <i class="fa-solid fa-id-card-clip"></i>
-                            Account information
-                        </h2>
+                            About your account
+                        </h1>
                         <div id="accountInfoDetail" class="txn-detail hidden">
                             <ul class="txn-detail-list">
                                 <li>
@@ -564,7 +620,7 @@
         </main>
 
         <footer class="app-footer noselect">
-            <a class="route-link" data-route href="release_notes">v2a</a> - environment: <strong
+            <a class="route-link" data-route href="release_notes">v3 (2026-03-01)</a> - environment: <strong
                 id="envLabel">..</strong>
         </footer>
     </div>
