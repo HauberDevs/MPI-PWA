@@ -26,7 +26,10 @@ const lookupView = document.getElementById("lookupView");
 const transactionView = document.getElementById("transactionView");
 const releaseNotesView = document.getElementById("releaseNotesView");
 const accountInfoView = document.getElementById("accountInfoView");
-const moneyGeneratorView = document.getElementById("moneyGeneratorView");
+const settingsView = document.getElementById("settingsView");
+const settingsForm = document.getElementById("settingsForm");
+const displayPrefUsername = document.getElementById("displayPrefUsername");
+const displayPrefFull = document.getElementById("displayPrefFull");
 
 const dashboardCard = document.getElementById("dashboardCard");
 const transactionsCard = document.getElementById("transactionsCard");
@@ -78,10 +81,10 @@ const routeViews = {
   transfer: transferView,
   paymentLink: paymentLinkView,
   lookup: lookupView,
-  moneyGenerator: moneyGeneratorView,
   transactionDetail: transactionView,
   releaseNotes: releaseNotesView,
-  me: accountInfoView
+  me: accountInfoView,
+  settings: settingsView
 };
 
 const ROUTE_PATHS = {
@@ -96,7 +99,7 @@ const ROUTE_PATHS = {
   lookup: "/lookup-link",
   releaseNotes: "release_notes",
   me: "/me",
-  moneyGenerator: "/money-generator"
+  settings: "/settings"
 };
 
 const ROUTE_TITLES = {
@@ -109,10 +112,10 @@ const ROUTE_TITLES = {
   onboarding: "Welcome to MyPayIndia",
   leaderboard: "Leaderboard",
   lookup: "Payment link info",
-  moneyGenerator: "Money generator",
   transactionDetail: "Transaction info",
   releaseNotes: "Release notes",
-  me: "Account info"
+  me: "Account info",
+  settings: "Settings"
 };
 
 const AUTH_REQUIRED_ROUTES = new Set([
@@ -121,7 +124,7 @@ const AUTH_REQUIRED_ROUTES = new Set([
   "history",
   "transfer",
   "paymentLink",
-  "moneyGenerator",
+  "settings",
   "me",
   "transactionDetail",
   "logoutFlow"
@@ -135,7 +138,7 @@ const NAV_ROUTES = new Set([
   "transfer",
   "paymentLink",
   "lookup",
-  "moneyGenerator",
+  "settings",
   "me"
 ]);
 
@@ -284,7 +287,7 @@ function resolveRoute(path) {
   if (path.startsWith("/transfer")) return "transfer";
   if (path.startsWith("/payment-link")) return "paymentLink";
   if (path.startsWith("/lookup-link")) return "lookup";
-  if (path.startsWith("/money-generator")) return "moneyGenerator";
+  if (path.startsWith("/settings")) return "settings";
   if (path.startsWith("/transaction/")) return "transactionDetail";
   if (path.startsWith("release_notes")) return "releaseNotes";
   if (path.startsWith("/me")) return "me";
@@ -480,6 +483,7 @@ function renderAccountInfo() {
 
 function setAccountInfo(info) {
   accountInfoCache = info || null;
+  updateUserIdentityFromPreference();
   if (currentRoute === "me") {
     renderAccountInfo();
   }
@@ -661,6 +665,46 @@ function setBalanceDisplay(value) {
 
 setBalanceDisplay(0);
 
+const DISPLAY_NAME_STORAGE_KEY = "display";
+
+function getDisplayNamePreference() {
+  try {
+    const v = window.localStorage.getItem(DISPLAY_NAME_STORAGE_KEY);
+    return v === "full" ? "full" : "user";
+  } catch (err) {
+    return "user";
+  }
+}
+
+function setDisplayNamePreference(value) {
+  const normalized = value === "full" ? "full" : "user";
+  try {
+    window.localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, normalized);
+  } catch (err) {
+    null
+  }
+  updateUserIdentityFromPreference();
+}
+
+function computePreferredName() {
+  const pref = getDisplayNamePreference();
+  if (!isLoggedIn) return "";
+  const info = accountInfoCache || {};
+  const username = info.username || "";
+  if (pref === "full") {
+    const first = (info.first_name || "").trim();
+    const last = (info.last_name || "").trim();
+    const full = `${first} ${last}`.trim();
+    return full || username || "";
+  }
+  return username || "";
+}
+
+function updateUserIdentityFromPreference() {
+  const name = computePreferredName();
+  setUserIdentity(name);
+}
+
 function resetApplicationState() {
   isLoggedIn = false;
   pendingProtectedRoute = null;
@@ -834,6 +878,10 @@ function applyRoute(route) {
     renderAccountInfo();
   }
 
+  if (key === "settings") {
+    renderSettings();
+  }
+
   if (key === "transactionDetail") {
     loadTransactionDetailFromLocation();
   }
@@ -866,6 +914,35 @@ routeLinks.forEach((link) => {
     navigate(href);
   });
 });
+
+function renderSettings() {
+  if (!settingsView || !settingsForm) return;
+  const pref = getDisplayNamePreference();
+  if (displayPrefUsername) displayPrefUsername.checked = pref !== "full";
+  if (displayPrefFull) displayPrefFull.checked = pref === "full";
+  const fullAvailable = Boolean(
+    accountInfoCache && (((accountInfoCache.first_name || "").trim()) || ((accountInfoCache.last_name || "").trim()))
+  );
+  if (displayPrefFull) {
+    const disable = (!fullAvailable && !isLoggedIn) || (!fullAvailable && pref === "username");
+    displayPrefFull.disabled = disable;
+    displayPrefFull.title = disable ? "Full name not available" : "";
+  }
+  if (!fullAvailable && pref === "full") {
+    setDisplayNamePreference("username");
+    if (displayPrefUsername) displayPrefUsername.checked = true;
+    if (displayPrefFull) displayPrefFull.checked = false;
+  }
+  updateSettingsUIState();
+}
+
+function updateSettingsUIState() {
+  if (!settingsForm) return;
+  const chips = settingsForm.querySelectorAll("label.radio-chip");
+  chips.forEach((chip) => chip.classList.remove("selected"));
+  if (displayPrefUsername?.checked) displayPrefUsername.closest("label")?.classList.add("selected");
+  if (displayPrefFull?.checked) displayPrefFull.closest("label")?.classList.add("selected");
+}
 
 if (userStatusPill) {
   const navigateToAccountInfo = () => {
@@ -953,9 +1030,10 @@ async function loadDashboard({ silent = false } = {}) {
   if (refreshTxnBtn) refreshTxnBtn.classList.remove("hidden");
   if (refreshHistoryBtn) refreshHistoryBtn.classList.remove("hidden");
 
-  setUserIdentity(info.username || "");
-  setBalanceDisplay(info.balance);
+  // Update account info first so preferences can compute the display name
   setAccountInfo(info);
+  updateUserIdentityFromPreference();
+  setBalanceDisplay(info.balance);
 
   await loadTransactions({ showErrors: true });
 
@@ -1064,3 +1142,17 @@ window.MyPayApp = {
 };
 
 loadDashboard();
+
+// Settings listeners
+if (displayPrefUsername) {
+  displayPrefUsername.addEventListener("change", () => {
+    if (displayPrefUsername.checked) setDisplayNamePreference("username");
+    updateSettingsUIState();
+  });
+}
+if (displayPrefFull) {
+  displayPrefFull.addEventListener("change", () => {
+    if (displayPrefFull.checked) setDisplayNamePreference("full");
+    updateSettingsUIState();
+  });
+}
