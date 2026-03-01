@@ -442,7 +442,6 @@ function renderAccountInfo() {
 
   if (!isLoggedIn) {
     accountInfoDetail.classList.add("hidden");
-    accountInfoStatus.innerHTML = "<span class='fa-fade'>You must log in first!</span>";
     return;
   }
 
