@@ -944,7 +944,7 @@ function buildTeamCard(member) {
       link.target = "_blank";
       link.rel = "noopener";
       link.title = `${label}`;
-      link.setAttribute("aria-label", `${member?.name || "Member"} on ${label}`);
+      link.setAttribute("aria-label", `${member?.name || "Member"}'s ${label}`);
       const icon = document.createElement("i");
       icon.className = getTeamSocialIconClass(label);
       link.appendChild(icon);
