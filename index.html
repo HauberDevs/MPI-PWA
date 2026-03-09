@@ -90,11 +90,9 @@
             <div class="listButtons">
                 <h2>Meta</h2>
 
-                <a class="menu-link grouped-link" href="https://mypayindia.com/team">
+                <a class="menu-link route-link grouped-link" data-route href="/team">
                     <i class="fa-solid fa-people-group"></i>
                     Meet the team
-                    <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
-                        style="--fa-rotate-angle: 320deg;"></i>
                 </a>
                 <a class="menu-link grouped-link" href="https://mypayindia.com/docs/">
                     <i class="fa-solid fa-book"></i>
@@ -448,12 +446,44 @@
                         </div>
                     </section>
                 </section>
+
+                <section id="teamView" class="view hidden">
+                    <section class="card" id="teamCard">
+                        <h1>
+                            <i class="fa-solid fa-people-group"></i>
+                            Meet the team
+                        </h1>
+                        <p>Get to know the people behind MyPayIndia, the future of online banking!</p>
+                        <p class="muted">Currently our team consists of <strong id="teamCountLabel"><i
+                                    class="fa-solid fa-hourglass fa-spin"></i></strong> people</p>
+                        <div class="team-grid" id="teamList" aria-live="polite"></div>
+                        <p class="muted form-status" id="teamStatus" role="status"></p>
+                    </section>
+                </section>
+
                 <section id="releaseNotesView" class="view hidden">
                     <section class="card onboarding-card" id="releaseNotesCard">
                         <h1>
                             <i class="fa-solid fa-scroll"></i>
                             Release notes
                         </h1>
+                        <details>
+                            <summary>
+                                <h3>Version 3a</h3>
+                            </summary>
+                            <p class="muted">9 Mar 2026</p>
+                            <ul>
+                                <li>Added a new <a class="route-link" data-route href="/team">Meet the team view</a>
+                                </li>
+                            </ul>
+                            <small>
+                                <ul>
+                                    <li>The Logged in as pill now shows "Loading..." during session check</li>
+                                    <li>The Balance pill is now hidden if you are not logged in</li>
+                                    <li>Both pills are hidden on the onboarding view</li>
+                                </ul>
+                            </small>
+                        </details>
                         <details>
                             <summary>
                                 <h3>Version 3</h3>
@@ -464,8 +494,12 @@
                                     accessible in the menu that, as of now, allows you to change your display name in
                                     the app from real name or username</li>
                                 <li>Removed the money generator view, it didn't work</li>
-                                <li>Updated some styling to look better, and also, the onboarding message</li>
                             </ul>
+                            <small>
+                                <ul>
+                                    <li>Updated some styling to look better, and also, the onboarding message</li>
+                                </ul>
+                            </small>
                         </details>
 
                         <details>
@@ -484,6 +518,7 @@
                             <summary>
                                 <h3>Version 2</h3>
                             </summary>
+                            <p class="muted">21st Feb 2026</p>
                             <ul>
                                 <li>Added a new transaction details view, click on a transaction on the dashboard or
                                     bespoke list! (/history)</li>
@@ -620,7 +655,7 @@
         </main>
 
         <footer class="app-footer noselect">
-            <a class="route-link" data-route href="release_notes">v3 (2026-03-01)</a> - environment: <strong
+            <a class="route-link" data-route href="release_notes">v3a (2026-03-09)</a> - environment: <strong
                 id="envLabel">..</strong>
         </footer>
     </div>

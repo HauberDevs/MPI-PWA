@@ -30,6 +30,10 @@ const settingsView = document.getElementById("settingsView");
 const settingsForm = document.getElementById("settingsForm");
 const displayPrefUsername = document.getElementById("displayPrefUsername");
 const displayPrefFull = document.getElementById("displayPrefFull");
+const teamView = document.getElementById("teamView");
+const teamStatus = document.getElementById("teamStatus");
+const teamList = document.getElementById("teamList");
+const teamCountLabel = document.getElementById("teamCountLabel");
 
 const dashboardCard = document.getElementById("dashboardCard");
 const transactionsCard = document.getElementById("transactionsCard");
@@ -42,6 +46,7 @@ const displayUser = document.getElementById("displayUser");
 const userStatusLabel = document.getElementById("userStatusLabel");
 const userStatusName = document.getElementById("userStatusName");
 const userStatusPill = document.getElementById("userStatusPill");
+const balanceStatusPill = document.getElementById("balanceStatusPill");
 const balanceStatusValue = document.getElementById("balanceStatusValue");
 const displayBalance = document.getElementById("displayBalance");
 const ctaCard = document.getElementById("ctaCard");
@@ -82,6 +87,7 @@ const routeViews = {
   paymentLink: paymentLinkView,
   lookup: lookupView,
   transactionDetail: transactionView,
+  team: teamView,
   releaseNotes: releaseNotesView,
   me: accountInfoView,
   settings: settingsView
@@ -98,6 +104,7 @@ const ROUTE_PATHS = {
   paymentLink: "/payment-link",
   lookup: "/lookup-link",
   releaseNotes: "release_notes",
+  team: "/team",
   me: "/me",
   settings: "/settings"
 };
@@ -113,6 +120,7 @@ const ROUTE_TITLES = {
   leaderboard: "Leaderboard",
   lookup: "Payment link info",
   transactionDetail: "Transaction info",
+  team: "Meet the team",
   releaseNotes: "Release notes",
   me: "Account info",
   settings: "Settings"
@@ -138,9 +146,21 @@ const NAV_ROUTES = new Set([
   "transfer",
   "paymentLink",
   "lookup",
+  "team",
   "settings",
   "me"
 ]);
+
+const TEAM_DATA_URL = "https://i.exerinity.com/mypayindia-team.json";
+const TEAM_IMAGE_BASE_URL = "https://mypayindia.com/siteassets/images/profile_images/";
+const TEAM_FALLBACK_IMAGE = "/app/media/logofull.png";
+const TEAM_SOCIAL_ICONS = {
+  website: "fa-solid fa-globe",
+  twitter: "fa-brands fa-twitter",
+  github: "fa-brands fa-github",
+  youtube: "fa-brands fa-youtube",
+  reddit: "fa-brands fa-reddit-alien"
+};
 
 const ONBOARDING_STORAGE_KEY = "acceptedOnboard";
 
@@ -197,6 +217,8 @@ let currentTransactionDetailId = null;
 let transactionDetailLoading = false;
 let transactionDetailRequestToken = 0;
 let accountInfoCache = null;
+let teamCache = null;
+let teamLoading = false;
 
 function hasAcceptedOnboarding() {
   try {
@@ -210,7 +232,7 @@ function markOnboardingAccepted() {
   try {
     window.localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
   } catch (err) {
-    // ignore storage errors
+    null
   }
 }
 
@@ -289,6 +311,7 @@ function resolveRoute(path) {
   if (path.startsWith("/lookup-link")) return "lookup";
   if (path.startsWith("/settings")) return "settings";
   if (path.startsWith("/transaction/")) return "transactionDetail";
+  if (path.startsWith("/team")) return "team";
   if (path.startsWith("release_notes")) return "releaseNotes";
   if (path.startsWith("/me")) return "me";
   if (path.startsWith("/onboarding")) return "onboarding";
@@ -664,6 +687,19 @@ function setBalanceDisplay(value) {
 
 setBalanceDisplay(0);
 
+function updateTopPillsVisibility() {
+  const hideForOnboarding = isLoggedIn && currentRoute === "onboarding";
+  if (userStatusPill) {
+    userStatusPill.classList.toggle("hidden", hideForOnboarding);
+  }
+  if (balanceStatusPill) {
+    const hideBalance = hideForOnboarding || !isLoggedIn;
+    balanceStatusPill.classList.toggle("hidden", hideBalance);
+  }
+}
+
+updateTopPillsVisibility();
+
 const DISPLAY_NAME_STORAGE_KEY = "display";
 
 function getDisplayNamePreference() {
@@ -728,6 +764,7 @@ function resetApplicationState() {
   setUserIdentity("");
   setBalanceDisplay(0);
   updateLoginRequiredNotice();
+  updateTopPillsVisibility();
 }
 
 function updateLoginRequiredNotice() {
@@ -830,6 +867,153 @@ function renderLeaderboard() {
   });
 }
 
+function setTeamCount(count) {
+  if (!teamCountLabel) return;
+  const safe = Number.isFinite(count) ? count : 0;
+  if (safe === 0) {
+    teamCountLabel.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i>";
+  } else {
+    teamCountLabel.textContent = safe.toString();
+  }
+}
+
+function setTeamStatus(message, { isError = false, allowHtml = false } = {}) {
+  if (!teamStatus) return;
+  teamStatus.classList.toggle("status-error", Boolean(isError));
+  if (allowHtml) {
+    teamStatus.innerHTML = message;
+  } else {
+    teamStatus.textContent = message || "";
+  }
+}
+
+function getTeamSocialIconClass(label) {
+  const key = (label || "").toLowerCase();
+  return TEAM_SOCIAL_ICONS[key] || "fa-solid fa-link";
+}
+
+function buildTeamImageUrl(image) {
+  if (!image) return TEAM_FALLBACK_IMAGE;
+  if (/^https?:\/\//i.test(image)) return image;
+  const base = TEAM_IMAGE_BASE_URL.replace(/\/+$/, "");
+  const trimmed = String(image).replace(/^\/+/, "");
+  return `${base}/${trimmed}`;
+}
+
+function buildTeamCard(member) {
+  const card = document.createElement("article");
+  card.className = "team-card";
+
+  const avatar = document.createElement("div");
+  avatar.className = "team-avatar";
+  const img = document.createElement("img");
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.src = buildTeamImageUrl(member?.image);
+  img.alt = member?.name ? `${member.name}'s profile photo` : "Team member";
+  img.addEventListener("error", () => {
+    if (img.dataset.fallbackApplied) return;
+    img.dataset.fallbackApplied = "1";
+    img.src = TEAM_FALLBACK_IMAGE;
+  });
+  avatar.appendChild(img);
+
+  const meta = document.createElement("div");
+  meta.className = "team-meta";
+  const name = document.createElement("h3");
+  name.textContent = member?.name || "Unknown member";
+  const role = document.createElement("p");
+  role.className = "team-role";
+  role.textContent = member?.role || "Team member";
+  meta.appendChild(name);
+  meta.appendChild(role);
+  if (member?.since) {
+    const since = document.createElement("p");
+    since.className = "team-since";
+    since.textContent = `Since ${member.since}`;
+    meta.appendChild(since);
+  }
+
+  const socials = document.createElement("div");
+  socials.className = "team-socials";
+  const socialEntries = Object.entries(member?.socials || {}).filter(([, url]) => Boolean(url));
+  if (socialEntries.length) {
+    socialEntries.forEach(([label, url]) => {
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.title = `${label}`;
+      link.setAttribute("aria-label", `${member?.name || "Member"} on ${label}`);
+      const icon = document.createElement("i");
+      icon.className = getTeamSocialIconClass(label);
+      link.appendChild(icon);
+      socials.appendChild(link);
+    });
+  } else {
+    const noLinks = document.createElement("span");
+    noLinks.className = "team-no-socials muted";
+    noLinks.textContent = null;
+    socials.appendChild(noLinks);
+  }
+
+  const header = document.createElement("div");
+  header.className = "team-card-header";
+  header.appendChild(avatar);
+  header.appendChild(meta);
+
+  card.appendChild(header);
+  card.appendChild(socials);
+  return card;
+}
+
+function renderTeam() {
+  if (!teamList || !teamStatus) return;
+  teamList.innerHTML = "";
+  if (!teamCache || !teamCache.length) {
+    setTeamStatus("No data returned");
+    setTeamCount(0);
+    return;
+  }
+  setTeamStatus("");
+  setTeamCount(teamCache.length);
+  teamCache.forEach((member) => {
+    teamList.appendChild(buildTeamCard(member));
+  });
+}
+
+async function loadTeam() {
+  if (!teamList || !teamStatus) return;
+
+  if (teamCache && teamCache.length) {
+    renderTeam();
+    return;
+  }
+
+  if (teamLoading) return;
+  teamLoading = true;
+  teamList.innerHTML = "";
+  setTeamStatus("<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Retrieving data...</span>", {
+    allowHtml: true
+  });
+
+  try {
+    const response = await fetch(TEAM_DATA_URL, { cache: "no-cache" });
+    if (!response.ok) {
+      throw new Error(`Failed with status ${response.status}`);
+    }
+    const data = await response.json();
+    teamCache = Array.isArray(data) ? data : [];
+    renderTeam();
+  } catch (err) {
+    teamCache = null;
+    setTeamStatus("No data returned - please see <a href='https://mypayindia.com/team'>mypayindia.com/team</a>", { allowHtml: true, isError: true });
+    setTeamCount(0);
+  } finally {
+    teamLoading = false;
+  }
+}
+
 function applyRoute(route) {
   let key = route;
 
@@ -864,9 +1048,14 @@ function applyRoute(route) {
   currentRoute = key;
   document.title = ROUTE_TITLES[key] + " / MyPayIndia" || "MyPayIndia";
   setActiveRouteLinks(NAV_ROUTES.has(key) ? key : null);
+  updateTopPillsVisibility();
 
   if (key === "leaderboard") {
     loadLeaderboard();
+  }
+
+  if (key === "team") {
+    loadTeam();
   }
 
   if (key === "history") {
@@ -990,17 +1179,18 @@ function forceLogoutReset() {
       window.localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
     }
   } catch (err) {
-    // ignore storage errors
+    null
   }
   try {
     window.sessionStorage.clear();
   } catch (err) {
-    // ignore storage errors
+    null
   }
 }
 
 async function loadDashboard({ silent = false } = {}) {
   if (!silent && loginStatus) {
+    setUserIdentity("Loading...");
     loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Checking if you are already logged in...</span>";
   }
 
@@ -1020,6 +1210,7 @@ async function loadDashboard({ silent = false } = {}) {
 
   isLoggedIn = true;
   if (!silent && loginStatus) loginStatus.textContent = "";
+  updateTopPillsVisibility();
 
   if (accountMenu) accountMenu.classList.remove("hidden");
   if (logoutBtn) logoutBtn.classList.remove("hidden");
@@ -1028,10 +1219,9 @@ async function loadDashboard({ silent = false } = {}) {
   if (ctaCard) ctaCard.classList.remove("hidden");
   if (refreshTxnBtn) refreshTxnBtn.classList.remove("hidden");
   if (refreshHistoryBtn) refreshHistoryBtn.classList.remove("hidden");
-
-  // Update account info first so preferences can compute the display name
-  setAccountInfo(info);
   updateUserIdentityFromPreference();
+
+  setAccountInfo(info);
   setBalanceDisplay(info.balance);
 
   await loadTransactions({ showErrors: true });
@@ -1139,10 +1329,6 @@ window.MyPayApp = {
   },
   refreshTransactions: () => loadTransactions({ showErrors: false })
 };
-
-loadDashboard();
-
-// Settings listeners
 if (displayPrefUsername) {
   displayPrefUsername.addEventListener("change", () => {
     if (displayPrefUsername.checked) setDisplayNamePreference("username");
@@ -1155,3 +1341,5 @@ if (displayPrefFull) {
     updateSettingsUIState();
   });
 }
+
+loadDashboard();
