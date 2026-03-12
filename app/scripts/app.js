@@ -164,6 +164,21 @@ const TEAM_SOCIAL_ICONS = {
 };
 
 const ONBOARDING_STORAGE_KEY = "acceptedOnboard";
+const REMEMBER_USERNAME_STORAGE_KEY = "rememberUsername";
+const REMEMBER_PASSWORD_STORAGE_KEY = "rememberPassword";
+const STORED_USERNAME_KEY = "storedUsername";
+const STORED_PASSWORD_KEY = "storedPassword";
+
+try {
+  if (!window.localStorage.getItem(REMEMBER_USERNAME_STORAGE_KEY)) {
+    window.localStorage.setItem(REMEMBER_USERNAME_STORAGE_KEY, "0");
+  }
+  if (!window.localStorage.getItem(REMEMBER_PASSWORD_STORAGE_KEY)) {
+    window.localStorage.setItem(REMEMBER_PASSWORD_STORAGE_KEY, "0");
+  }
+} catch (err) {
+  null
+}
 
 let deferredInstallPrompt = null;
 
@@ -233,6 +248,89 @@ function hasAcceptedOnboarding() {
 function markOnboardingAccepted() {
   try {
     window.localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
+  } catch (err) {
+    null
+  }
+}
+
+function getRememberUsernamePreference() {
+  try {
+    return window.localStorage.getItem(REMEMBER_USERNAME_STORAGE_KEY) === "1";
+  } catch (err) {
+    return false;
+  }
+}
+
+function getRememberPasswordPreference() {
+  try {
+    return window.localStorage.getItem(REMEMBER_PASSWORD_STORAGE_KEY) === "1";
+  } catch (err) {
+    return false;
+  }
+}
+
+function setRememberUsernamePreference(value) {
+  try {
+    window.localStorage.setItem(REMEMBER_USERNAME_STORAGE_KEY, value ? "1" : "0");
+  } catch (err) {
+    null
+  }
+}
+
+function setRememberPasswordPreference(value) {
+  try {
+    window.localStorage.setItem(REMEMBER_PASSWORD_STORAGE_KEY, value ? "1" : "0");
+  } catch (err) {
+    null
+  }
+}
+
+function getStoredUsername() {
+  try {
+    return window.localStorage.getItem(STORED_USERNAME_KEY) || "";
+  } catch (err) {
+    return "";
+  }
+}
+
+function getStoredPassword() {
+  try {
+    return window.localStorage.getItem(STORED_PASSWORD_KEY) || "";
+  } catch (err) {
+    return "";
+  }
+}
+
+function setStoredUsername(username) {
+  try {
+    if (getRememberUsernamePreference()) {
+      window.localStorage.setItem(STORED_USERNAME_KEY, username);
+    } else {
+      window.localStorage.removeItem(STORED_USERNAME_KEY);
+    }
+  } catch (err) {
+    null
+  }
+}
+
+function setStoredPassword(password) {
+  try {
+    if (getRememberPasswordPreference()) {
+      window.localStorage.setItem(STORED_PASSWORD_KEY, password);
+    } else {
+      window.localStorage.removeItem(STORED_PASSWORD_KEY);
+    }
+  } catch (err) {
+    null
+  }
+}
+
+function clearStoredCredentials() {
+  try {
+    window.localStorage.removeItem(STORED_USERNAME_KEY);
+    window.localStorage.removeItem(STORED_PASSWORD_KEY);
+    window.localStorage.removeItem(REMEMBER_USERNAME_STORAGE_KEY);
+    window.localStorage.removeItem(REMEMBER_PASSWORD_STORAGE_KEY);
   } catch (err) {
     null
   }
@@ -1170,6 +1268,7 @@ function deleteAllCookies() {
 function forceLogoutReset() {
   resetApplicationState();
   deleteAllCookies();
+  clearStoredCredentials();
   let onboardingAccepted = null;
   try {
     onboardingAccepted = window.localStorage.getItem(ONBOARDING_STORAGE_KEY);
@@ -1202,6 +1301,30 @@ async function loadDashboard({ silent = false } = {}) {
     info = await apiInfo();
   } catch (err) {
     info = { success: false };
+  }
+
+  if (!info.success) {
+    const storedUsername = getStoredUsername();
+    const storedPassword = getStoredPassword();
+
+    if (storedUsername && storedPassword) {
+      if (!silent && loginStatus) {
+        loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging you back in...</span>";
+      }
+
+      try {
+        const loginResponse = await apiLogin(storedUsername, storedPassword);
+        if (loginResponse.success) {
+          try {
+            info = await apiInfo();
+          } catch (err) {
+            info = { success: false };
+          }
+        }
+      } catch (err) {
+        info = { success: false };
+      }
+    }
   }
 
   if (!info.success) {
@@ -1265,7 +1388,70 @@ function stopAccountInfoRefresh() {
   }
 }
 
+function updateDeleteCredentialsButtonState() {
+  const deleteCredentialsBtn = document.getElementById("deleteCredentialsBtn");
+  if (!deleteCredentialsBtn) return;
+  
+  const rememberUsername = getRememberUsernamePreference();
+  const rememberPassword = getRememberPasswordPreference();
+  const hasCredentials = rememberUsername || rememberPassword;
+  
+  deleteCredentialsBtn.disabled = !hasCredentials;
+  deleteCredentialsBtn.title = hasCredentials 
+    ? "This does not log you out." 
+    : "You didn't choose to remember any credentials!";
+
+  deleteCredentialsBtn.innerHTML = hasCredentials
+    ? '<i class="fa-solid fa-trash"></i> Delete stored credentials'
+    : '<i class="fa-solid fa-trash"></i> No credentials stored';
+}
+
 if (loginForm) {
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const rememberUsernameBtn = document.getElementById("rememberUsername");
+  const rememberPasswordBtn = document.getElementById("rememberPassword");
+
+  if (rememberUsernameBtn) {
+    if (getRememberUsernamePreference()) {
+      rememberUsernameBtn.classList.add("active");
+      if (usernameInput) usernameInput.value = getStoredUsername();
+    } else {
+      rememberUsernameBtn.classList.remove("active");
+    }
+  }
+  
+  if (rememberPasswordBtn) {
+    if (getRememberPasswordPreference()) {
+      rememberPasswordBtn.classList.add("active");
+      if (passwordInput) passwordInput.value = getStoredPassword();
+    } else {
+      rememberPasswordBtn.classList.remove("active");
+    }
+  }
+
+  if (rememberUsernameBtn) {
+    rememberUsernameBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      rememberUsernameBtn.classList.toggle("active");
+      const isActive = rememberUsernameBtn.classList.contains("active");
+      setRememberUsernamePreference(isActive);
+      updateDeleteCredentialsButtonState();
+    });
+  }
+
+  if (rememberPasswordBtn) {
+    rememberPasswordBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      rememberPasswordBtn.classList.toggle("active");
+      const isActive = rememberPasswordBtn.classList.contains("active");
+      setRememberPasswordPreference(isActive);
+      updateDeleteCredentialsButtonState();
+    });
+  }
+
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     loginStatus.classList.remove("status-error");
@@ -1277,6 +1463,33 @@ if (loginForm) {
     if (!response.success) {
       loginStatus.classList.add("status-error"); loginStatus.textContent = response.message;
       return;
+    }
+
+    if (rememberUsernameBtn?.classList.contains("active")) {
+      try {
+        window.localStorage.setItem(STORED_USERNAME_KEY, username);
+      } catch (err) {
+        null
+      }
+    } else {
+      try {
+        window.localStorage.removeItem(STORED_USERNAME_KEY);
+      } catch (err) {
+        null
+      }
+    }
+    if (rememberPasswordBtn?.classList.contains("active")) {
+      try {
+        window.localStorage.setItem(STORED_PASSWORD_KEY, password);
+      } catch (err) {
+        null
+      }
+    } else {
+      try {
+        window.localStorage.removeItem(STORED_PASSWORD_KEY);
+      } catch (err) {
+        null
+      }
     }
 
     loginStatus.innerHTML = '<i class="fa-solid fa-check fa-fade" style="color: #00ff00;"></i> Logged in successfully - welcome back!';
@@ -1377,6 +1590,44 @@ if (displayPrefFull) {
 if (autoRefreshToggle) {
   autoRefreshToggle.addEventListener("change", () => {
     autoRefreshEnabled = autoRefreshToggle.checked;
+  });
+}
+
+const deleteCredentialsBtn = document.getElementById("deleteCredentialsBtn");
+if (deleteCredentialsBtn) {
+  updateDeleteCredentialsButtonState();
+  deleteCredentialsBtn.addEventListener("click", () => {
+    if (confirm("This does not log you out, or remove your cookies, it will only delete the credential keys from local storage. Are you sure?")) {
+      clearStoredCredentials();
+      const originalText = deleteCredentialsBtn.innerHTML;
+      deleteCredentialsBtn.innerHTML = '<i class="fa-solid fa-check" style="color: #00ff00;"></i> Credentials deleted';
+      deleteCredentialsBtn.disabled = true;
+      setTimeout(() => {
+        deleteCredentialsBtn.innerHTML = originalText;
+        deleteCredentialsBtn.disabled = false;
+        updateDeleteCredentialsButtonState();
+      }, 2000);
+    }
+  });
+}
+
+const deleteAllKeysBtn = document.getElementById("deleteAllKeysBtn");
+if (deleteAllKeysBtn) {
+  deleteAllKeysBtn.addEventListener("click", () => {
+    if (confirm("This will delete all local keys, including credentials (if you chose to retain them), your chosen theme, and onboarding status. If you didn't choose to retain your credentials, this won't do much for you except force the onboarding flow to show again. Continue?")) {
+      try {
+        window.localStorage.clear();
+      } catch (err) {
+        null
+      }
+      const originalText = deleteAllKeysBtn.innerHTML;
+      deleteAllKeysBtn.innerHTML = '<i class="fa-solid fa-check" style="color: #00ff00;"></i> All data deleted';
+      deleteAllKeysBtn.disabled = true;
+      setTimeout(() => {
+        deleteAllKeysBtn.innerHTML = originalText;
+        deleteAllKeysBtn.disabled = false;
+      }, 2000);
+    }
   });
 }
 
