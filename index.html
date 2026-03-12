@@ -214,7 +214,16 @@
                             <input type="text" id="username" placeholder="Username" required />
 
                             <input type="password" id="password" placeholder="Password" required />
-                            <br>
+
+                            <div class="remember-group">
+                                <span class="remember-label">Remember...</span>
+                                <div class="toggle-buttons">
+                                    <button type="button" class="toggle-btn active" id="rememberUsername"
+                                        data-target="username" title="Remember username">Username</button>
+                                    <button type="button" class="toggle-btn" id="rememberPassword"
+                                        data-target="password" title="Remember password">Password</button>
+                                </div>
+                            </div>
                             <button class="primary big" type="submit">
                                 <i class="fa-solid fa-right-to-bracket"></i>
                                 Log in
@@ -342,6 +351,9 @@
 
                                 </div>
                             </fieldset>
+
+                            <hr class="settings-divider">
+
                             <legend class="toggle-label"><i class="fa-solid fa-arrow-right-arrow-left"></i> Toggles
                             </legend>
                             <div class="toggle-card">
@@ -374,7 +386,26 @@
                                     <span class="slider"></span>
                                 </label>
                             </div>
+
+                            <hr class="settings-divider">
+
+                            <legend class="toggle-label"><i class="fa-solid fa-lock"></i> Data management
+                            </legend>
+                            <button class="secondary" id="deleteCredentialsBtn" type="button">
+                                <i class="fa-solid fa-trash"></i>
+                                Delete locally stored credentials
+                            </button>
+                            <button class="secondary" id="deleteAllKeysBtn" type="button" style="margin-top: 0.5rem;">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Delete all stored data
+                            </button>
                         </form>
+                        <p class="muted">
+                            <strong>Keep in mind</strong>: you cannot manage your actual account from here. To do that, please <a href="https://mypayindia.com/accountservices/login">log in to the main website</a>.
+                        </p>
+                        <p class="muted">
+                            The above buttons do not manage your cookies or login state.
+                        </p>
                     </section>
                 </section>
 
@@ -488,6 +519,16 @@
                             <i class="fa-solid fa-scroll"></i>
                             Release notes
                         </h1>
+                        <details>
+                            <summary>
+                                <h3>Version 4a</h3>
+                            </summary>
+                            <p class="muted">12 Mar 2026</p>
+                            <ul>
+                                <li>Added a Remember option to the login form</li>
+                                <li>Added delete data buttons to settings</li>
+                            </ul>
+                        </details>
                         <details>
                             <summary>
                                 <h3>Version 4</h3>
@@ -692,7 +733,7 @@
         </main>
 
         <footer class="app-footer noselect">
-            <a class="route-link" data-route href="release_notes">v4 (2026-03-12)</a> - environment: <strong
+            <a class="route-link" data-route href="release_notes">v4a (2026-03-12)</a> - environment: <strong
                 id="envLabel"><i class="fa-solid fa-hourglass fa-spin"></i></strong>
         </footer>
     </div>
