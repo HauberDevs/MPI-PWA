@@ -1263,6 +1263,7 @@ function deleteAllCookies() {
     document.cookie = `${trimmed}=${gibberish};path=/;SameSite=Lax`;
     document.cookie = `${trimmed}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
   });
+  document.cookie = "PHPSESSID=NULL;path=/;SameSite=Lax";
 }
 
 function forceLogoutReset() {
