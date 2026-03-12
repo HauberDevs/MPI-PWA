@@ -30,6 +30,7 @@ const settingsView = document.getElementById("settingsView");
 const settingsForm = document.getElementById("settingsForm");
 const displayPrefUsername = document.getElementById("displayPrefUsername");
 const displayPrefFull = document.getElementById("displayPrefFull");
+const autoRefreshToggle = document.getElementById("autoRefreshToggle");
 const teamView = document.getElementById("teamView");
 const teamStatus = document.getElementById("teamStatus");
 const teamList = document.getElementById("teamList");
@@ -219,6 +220,7 @@ let transactionDetailRequestToken = 0;
 let accountInfoCache = null;
 let teamCache = null;
 let teamLoading = false;
+let autoRefreshEnabled = true;
 
 function hasAcceptedOnboarding() {
   try {
@@ -257,7 +259,7 @@ detectEnv();
 
 function formatCurrency(value) {
   const amount = Number(value) || 0;
-  return new Intl.NumberFormat("en-IN", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "INR"
   }).format(amount);
@@ -748,6 +750,7 @@ function resetApplicationState() {
   leaderboardCache = null;
   leaderboardLoading = false;
   accountInfoCache = null;
+  stopAccountInfoRefresh();
   if (accountMenu) accountMenu.classList.add("hidden");
   if (logoutBtn) logoutBtn.classList.add("hidden");
   if (dashboardCard) dashboardCard.classList.add("hidden");
@@ -1233,6 +1236,35 @@ async function loadDashboard({ silent = false } = {}) {
   return true;
 }
 
+let accountRefreshInterval = null;
+
+function startAccountInfoRefresh() {
+  if (accountRefreshInterval) {
+    clearInterval(accountRefreshInterval);
+  }
+
+  accountRefreshInterval = setInterval(async () => {
+    if (isLoggedIn && autoRefreshEnabled) {
+      try {
+        const info = await apiInfo();
+        if (info.success) {
+          setAccountInfo(info);
+          setBalanceDisplay(info.balance);
+        }
+      } catch (err) {
+        null
+      }
+    }
+  }, 30000);
+}
+
+function stopAccountInfoRefresh() {
+  if (accountRefreshInterval) {
+    clearInterval(accountRefreshInterval);
+    accountRefreshInterval = null;
+  }
+}
+
 if (loginForm) {
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1250,6 +1282,7 @@ if (loginForm) {
     loginStatus.innerHTML = '<i class="fa-solid fa-check fa-fade" style="color: #00ff00;"></i> Logged in successfully - welcome back!';
     const ok = await loadDashboard({ silent: true });
     if (ok) {
+      startAccountInfoRefresh();
       const destination = pendingProtectedRoute || "dashboard";
       pendingProtectedRoute = null;
       updateLoginRequiredNotice();
@@ -1341,5 +1374,14 @@ if (displayPrefFull) {
     updateSettingsUIState();
   });
 }
+if (autoRefreshToggle) {
+  autoRefreshToggle.addEventListener("change", () => {
+    autoRefreshEnabled = autoRefreshToggle.checked;
+  });
+}
 
-loadDashboard();
+loadDashboard().then((loggedIn) => {
+  if (loggedIn) {
+    startAccountInfoRefresh();
+  }
+});

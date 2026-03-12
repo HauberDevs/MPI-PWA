@@ -150,7 +150,7 @@ body.dark .menu-btn:hover {
   border: 1px solid var(--border);
   background: var(--card);
   padding: 0.45rem 0.8rem;
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 0.55rem;
   min-width: 0;
@@ -456,6 +456,11 @@ body.dark .activity .item {
 
   .menu {
     width: 360px;
+  }
+
+  .user-pill,
+  .balance-pill {
+    display: inline-flex;
   }
 }
 

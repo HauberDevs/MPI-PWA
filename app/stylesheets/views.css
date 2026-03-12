@@ -3,6 +3,26 @@
   align-items: center;
 }
 
+.balance-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+@media (min-width: 900px) {
+  .balance-text {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+#accountInfoBalance {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
 .logo-link img {
   display: block;
 }
@@ -40,6 +60,11 @@
   margin-top: auto;
 }
 
+.accountMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
 
 .external-link-icon {
   margin-left: 0.4rem;
@@ -328,14 +353,29 @@ body.dark .result-panel {
   gap: 0.5rem;
 }
 
-
-
-
-#accountMenu .menu-link {
-  margin-top: 0.65rem;
+.accountMenu .menu-link {
+  margin-top: 0;
 }
 
-#accountMenu .menu-link:first-of-type {
+.accountMenu .menu-link:first-of-type {
+  margin-top: 0;
+}
+
+.appControl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.appControl .menu-link {
+  margin-top: 0;
+}
+
+.appControl .menu-link:first-of-type {
+  margin-top: 0;
+}
+
+.appControl .menu-link:first-of-type {
   margin-top: 0;
 }
 
