@@ -1529,6 +1529,14 @@ if (confirmLogoutBtn) {
     confirmLogoutBtn.disabled = true;
     confirmLogoutBtn.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging out...</span>";
     const cachebuster = Date.now().toString(36);
+    try {
+      await fetch(`https://pr.app.mypayindia.com/api/logout?cachebuster=${cachebuster}`, {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (err) {
+      null
+    }
     forceLogoutReset();
     const logoutUrl = `${ROUTE_PATHS.loginFlow}?cachebuster=${cachebuster}`;
     window.location.href = logoutUrl;
