@@ -177,6 +177,7 @@ const REMEMBER_USERNAME_STORAGE_KEY = "rememberUsername";
 const REMEMBER_PASSWORD_STORAGE_KEY = "rememberPassword";
 const STORED_USERNAME_KEY = "storedUsername";
 const STORED_PASSWORD_KEY = "storedPassword";
+const AUTO_REFRESH_STORAGE_KEY = "autoRefreshEnabled";
 
 try {
   if (!window.localStorage.getItem(REMEMBER_USERNAME_STORAGE_KEY)) {
@@ -245,6 +246,30 @@ let accountInfoCache = null;
 let teamCache = null;
 let teamLoading = false;
 let autoRefreshEnabled = true;
+
+autoRefreshEnabled = getStoredAutoRefreshPreference();
+if (autoRefreshToggle) {
+  autoRefreshToggle.checked = autoRefreshEnabled;
+}
+
+function getStoredAutoRefreshPreference() {
+  try {
+    const stored = window.localStorage.getItem(AUTO_REFRESH_STORAGE_KEY);
+    if (stored === "0") return false;
+    if (stored === "1") return true;
+  } catch (err) {
+    null
+  }
+  return true;
+}
+
+function setStoredAutoRefreshPreference(value) {
+  try {
+    window.localStorage.setItem(AUTO_REFRESH_STORAGE_KEY, value ? "1" : "0");
+  } catch (err) {
+    null
+  }
+}
 
 function hasAcceptedOnboarding() {
   try {
@@ -1625,6 +1650,7 @@ if (displayPrefFull) {
 if (autoRefreshToggle) {
   autoRefreshToggle.addEventListener("change", () => {
     autoRefreshEnabled = autoRefreshToggle.checked;
+    setStoredAutoRefreshPreference(autoRefreshEnabled);
   });
 }
 
