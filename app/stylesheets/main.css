@@ -93,7 +93,7 @@ i {
   color: var(--accent);
   padding: 0.75rem 1rem;
   margin: 0.8rem 0 1rem;
-  font-weight: 600;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -192,7 +192,7 @@ body.dark .menu-btn:hover {
 .user-pill-username,
 .balance-pill-value {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -247,7 +247,7 @@ body.dark .menu-btn:hover {
 
 .menu h2 {
   font-size: 1.4rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
@@ -337,12 +337,12 @@ input:checked+.slider:before {
 
 .card h1 {
   font-size: 1rem;
-  font-weight: 850;
+  font-weight: 750;
 }
 
 .card h2 {
   font-size: 1.2rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 0.8rem;
 
   display: flex;
@@ -382,7 +382,7 @@ button {
 
   border-radius: var(--radius);
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
 
   cursor: pointer;
   transition: 0.2s;
@@ -483,7 +483,7 @@ body.dark .activity .item {
 
 .activity .item.txn-row .amount {
   font-size: 1.35rem;
-  font-weight: 850;
+  font-weight: 750;
   white-space: nowrap;
   color: var(--text);
 }
@@ -516,7 +516,7 @@ body.dark .activity .item {
 }
 
 .activity .item.txn-row .party {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .activity .item.txn-row .arrow {
@@ -552,11 +552,11 @@ body.dark .activity .item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .activity .item.txn-row .name {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .activity .item.txn-row .arrow {
@@ -617,12 +617,12 @@ body.dark .activity .item {
 }
 
 .txn-detail-list .label {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--muted);
 }
 
 .txn-detail-list .value {
-  font-weight: 600;
+  font-weight: 500;
   margin-left: auto;
 }
 
@@ -655,7 +655,7 @@ body.dark .app-footer {
 .app-footer a {
   color: inherit;
   text-decoration: underline;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .app-footer a:hover {
