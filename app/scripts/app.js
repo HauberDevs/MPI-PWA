@@ -6,6 +6,15 @@ if (typeof window.DEV_MODE === "undefined") {
 const loginForm = document.getElementById("loginForm");
 const loginStatus = document.getElementById("loginStatus");
 const loginWarning = document.getElementById("loginWarning");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const loginSubmitBtn = loginForm ? loginForm.querySelector("button[type='submit'], input[type='submit']") : null;
+
+function setLoginControlsDisabled(disabled) {
+  if (usernameInput) usernameInput.disabled = disabled;
+  if (passwordInput) passwordInput.disabled = disabled;
+  if (loginSubmitBtn) loginSubmitBtn.disabled = disabled;
+}
 const logoutBtn = document.getElementById("logoutBtn");
 const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
 const cancelLogoutBtn = document.getElementById("cancelLogoutBtn");
@@ -1296,6 +1305,7 @@ async function loadDashboard({ silent = false } = {}) {
     setUserIdentity("Loading...");
     loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Checking if you are already logged in...</span>";
   }
+  if (!silent) setLoginControlsDisabled(true);
 
   let info;
   try {
@@ -1312,6 +1322,7 @@ async function loadDashboard({ silent = false } = {}) {
       if (!silent && loginStatus) {
         loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging you back in...</span>";
       }
+      if (!silent) setLoginControlsDisabled(true);
 
       try {
         const loginResponse = await apiLogin(storedUsername, storedPassword);
@@ -1331,12 +1342,14 @@ async function loadDashboard({ silent = false } = {}) {
   if (!info.success) {
     resetApplicationState();
     if (!silent && loginStatus) loginStatus.textContent = "";
+    if (!silent) setLoginControlsDisabled(false);
     applyRoute("loginFlow");
     return false;
   }
 
   isLoggedIn = true;
   if (!silent && loginStatus) loginStatus.textContent = "";
+  if (!silent) setLoginControlsDisabled(false);
   updateTopPillsVisibility();
 
   if (accountMenu) accountMenu.classList.remove("hidden");
@@ -1408,8 +1421,6 @@ function updateDeleteCredentialsButtonState() {
 }
 
 if (loginForm) {
-  const usernameInput = document.getElementById("username");
-  const passwordInput = document.getElementById("password");
   const rememberUsernameBtn = document.getElementById("rememberUsername");
   const rememberPasswordBtn = document.getElementById("rememberPassword");
 
@@ -1457,12 +1468,22 @@ if (loginForm) {
     event.preventDefault();
     loginStatus.classList.remove("status-error");
     loginStatus.innerHTML = "<i class='fa-solid fa-hourglass fa-spin'></i> <span class='fa-fade'>Logging in...</span>";
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    const response = await apiLogin(username, password);
+    setLoginControlsDisabled(true);
+    const username = usernameInput ? usernameInput.value : "";
+    const password = passwordInput ? passwordInput.value : "";
+    let response;
+    try {
+      response = await apiLogin(username, password);
+    } catch (err) {
+      loginStatus.classList.add("status-error");
+      loginStatus.innerHTML = `Unable to log in right now. Please try again later, check your internet connection, or <a href="https://status.mypayindia.com/" target="_blank" rel="noopener">check our status page</a><br><br>Error: ${err.message || err}`;
+      setLoginControlsDisabled(false);
+      return;
+    }
 
     if (!response.success) {
       loginStatus.classList.add("status-error"); loginStatus.textContent = response.message;
+      setLoginControlsDisabled(false);
       return;
     }
 
@@ -1494,7 +1515,12 @@ if (loginForm) {
     }
 
     loginStatus.innerHTML = '<i class="fa-solid fa-check fa-fade" style="color: #00ff00;"></i> Logged in successfully - welcome back!';
-    const ok = await loadDashboard({ silent: true });
+    let ok = false;
+    try {
+      ok = await loadDashboard({ silent: true });
+    } finally {
+      setLoginControlsDisabled(false);
+    }
     if (ok) {
       startAccountInfoRefresh();
       const destination = pendingProtectedRoute || "dashboard";
