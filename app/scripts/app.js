@@ -104,8 +104,8 @@ const routeViews = {
 };
 
 const ROUTE_PATHS = {
-  loginFlow: "/flow/login",
-  logoutFlow: "/flow/logout",
+  loginFlow: "login",
+  logoutFlow: "logout",
   onboarding: "/onboarding",
   dashboard: "/dashboard",
   leaderboard: "/leaderboard",
@@ -436,8 +436,8 @@ function formatTxnDate(value) {
 
 function resolveRoute(path) {
   if (!path) return "dashboard";
-  if (path.startsWith("/flow/login")) return "loginFlow";
-  if (path.startsWith("/flow/logout")) return "logoutFlow";
+  if (path.startsWith("login")) return "loginFlow";
+  if (path.startsWith("logout")) return "logoutFlow";
   if (path.startsWith("/leaderboard")) return "leaderboard";
   if (path.startsWith("/history")) return "history";
   if (path.startsWith("/transfer")) return "transfer";

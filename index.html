@@ -142,9 +142,9 @@
                     Create payment link
                 </a>
 
-                <a class="menu-link grouped-link" href="https://mypayindia.com/accountservices/moneygenerator">
+                <a class="menu-link grouped-link" href="https://mypayindia.com/accountservices/iotm/">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
-                    Money generator
+                    Investment Opportunities™
                     <i class="fa-solid fa-arrow-right fa-rotate-by external-link-icon"
                         style="--fa-rotate-angle: 320deg;"></i>
                 </a>
@@ -177,22 +177,24 @@
                     <i class="fa-solid fa-gear"></i>
                     Settings
                 </a>
-                <a class="menu-link route-link hidden" data-route href="/flow/logout" id="logoutBtn">
+                <a class="menu-link route-link hidden" data-route href="logout" id="logoutBtn">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    Log out (rudimental)
+                    Logout
                 </a>
             </div>
 
             <!-- credits -->
             <div class="credits noselect muted">
-                App by <a href="https://exerinity.com" target="_blank">exerinity</a>
+                App by <a href="https://exerinity.com" target="_blank">exerinity</a><br><a class="route-link" data-route
+                    href="release_notes">Version 4b (2026-03-12)</a><br>environment: <strong id="envLabel"><i
+                        class="fa-solid fa-hourglass fa-spin"></i></strong>
             </div>
         </aside>
 
         <main>
             <div class="login-warning hidden" id="loginWarning" role="alert">
                 <i class="fa-solid fa-circle-exclamation"></i>
-                <span>This resource requires you to be logged in</span>
+                <span>You must be logged in to view this!</span>
             </div>
             <noscript>
                 <div class="login-warning" role="alert">
@@ -241,9 +243,6 @@
                             <button class="secondary" id="cancelLogoutBtn">Cancel</button>
                             <button class="primary" id="confirmLogoutBtn">Log out</button>
                         </div>
-                        <p class="muted"><strong>Keep in mind</strong>: this might not work. To ensure you <i>actually
-                                get logged out</i>,
-                            perform a hard refresh (CTRL/CMD+Shift+R) and/or clear your cookies.</p>
                     </section>
                 </section>
             </div>
@@ -401,7 +400,9 @@
                             </button>
                         </form>
                         <p class="muted">
-                            <strong>Keep in mind</strong>: you cannot manage your actual account from here. To do that, please <a href="https://mypayindia.com/accountservices/login">log in to the main website</a>.
+                            <strong>Keep in mind</strong>: you cannot manage your actual account from here. To do that,
+                            please <a href="https://mypayindia.com/accountservices/login">log in to the main
+                                website</a>.
                         </p>
                         <p class="muted">
                             The above buttons do not manage your cookies or login state.
@@ -519,6 +520,16 @@
                             <i class="fa-solid fa-scroll"></i>
                             Release notes
                         </h1>
+                        <details>
+                            <summary>
+                                <h3>Version 4b</h3>
+                            </summary>
+                            <p class="muted">19 Mar 2026</p>
+                            <ul>
+                                <li>Updated money generator > investment opportunities links</li>
+                                <li>Removed footer and moved its contents to the menu</li>
+                            </ul>
+                        </details>
                         <details>
                             <summary>
                                 <h3>Version 4a</h3>
@@ -731,11 +742,6 @@
             </div>
 
         </main>
-
-        <footer class="app-footer noselect">
-            <a class="route-link" data-route href="release_notes">v4a (2026-03-12)</a> - environment: <strong
-                id="envLabel"><i class="fa-solid fa-hourglass fa-spin"></i></strong>
-        </footer>
     </div>
     <script src="/app/scripts/menu.js"></script>
     <script src="/app/scripts/theme.js"></script>

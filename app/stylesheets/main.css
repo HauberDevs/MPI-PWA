@@ -634,34 +634,6 @@ body.dark .activity .item {
   color: #b3261e;
 }
 
-.app-footer {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: var(--radius);
-  background: #f1f1f1;
-  color: var(--muted);
-  font-size: 0.9rem;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  justify-content: center;
-  text-align: center;
-}
-
-body.dark .app-footer {
-  background: #1c1c1c;
-  color: #bbbbbb;
-}
-
-.app-footer a {
-  color: inherit;
-  text-decoration: underline;
-  font-weight: 500;
-}
-
-.app-footer a:hover {
-  opacity: 0.8;
-}
-
 
 @media (max-width: 520px) {
   .activity .item.txn-row {

@@ -3,4 +3,3 @@ Allow: /
 Disallow: /app/
 Disallow: LICENSE
 Disallow: .gitignore
-Disallow: /flow/
