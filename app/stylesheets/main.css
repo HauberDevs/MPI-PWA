@@ -1,5 +1,6 @@
 :root {
   --accent: #d03505;
+  --accent-rgb: 208, 53, 5;
 
   --bg: #ffffff;
   --text: #111111;
@@ -89,7 +90,7 @@ i {
 .login-warning {
   border: 2px solid var(--accent);
   border-radius: var(--radius-sm);
-  background: rgba(208, 53, 5, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   color: var(--accent);
   padding: 0.75rem 1rem;
   margin: 0.8rem 0 1rem;
@@ -211,7 +212,7 @@ body.dark .menu-btn:hover {
 
 .user-pill.user-pill-guest:focus-visible,
 .user-pill.user-pill-guest:hover {
-  box-shadow: 0 0 0 2px rgba(208, 53, 5, 0.25);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
 }
 
 .menu {
@@ -265,7 +266,7 @@ body.dark .menu-btn:hover {
   color: white;
   text-decoration: none;
 
-  box-shadow: 0 6px 14px rgba(208, 53, 5, 0.25);
+  box-shadow: 0 6px 14px rgba(var(--accent-rgb), 0.25);
 
   transition: 0.2s;
 }
@@ -409,7 +410,7 @@ button {
 }
 
 .secondary:hover {
-  background: rgba(208, 53, 5, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
 }
 
 
@@ -547,7 +548,7 @@ body.dark .activity .item {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(208, 53, 5, 0.15);
+  background: rgba(var(--accent-rgb), 0.15);
   color: var(--accent);
   display: inline-flex;
   align-items: center;

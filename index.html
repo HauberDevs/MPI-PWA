@@ -186,7 +186,7 @@
             <!-- credits -->
             <div class="credits noselect muted">
                 App by <a href="https://exerinity.com" target="_blank">exerinity</a><br><a class="route-link" data-route
-                    href="release_notes">Version 4b (2026-03-12)</a><br>environment: <strong id="envLabel"><i
+                    href="release_notes">Version 5 (2026-03-30)</a><br>environment: <strong id="envLabel"><i
                         class="fa-solid fa-hourglass fa-spin"></i></strong>
             </div>
         </aside>
@@ -388,6 +388,51 @@
 
                             <hr class="settings-divider">
 
+                            <legend class="toggle-label"><i class="fa-solid fa-palette" style="color: var(--accent)"></i> Accent color
+                            </legend>
+                            <div class="accent-settings">
+                                <div class="accent-presets" id="accentPresets">
+                                    <button class="accent-swatch" type="button" data-accent-color="#d03505">
+                                        <span class="accent-swatch-color" style="--swatch-color: #d03505;"></span>
+                                        <span>Default</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#ff8c00">
+                                        <span class="accent-swatch-color" style="--swatch-color: #ff8c00;"></span>
+                                        <span>Orange</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#ff00000">
+                                        <span class="accent-swatch-color" style="--swatch-color: #ff0000;"></span>
+                                        <span>Red</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#1e88e5">
+                                        <span class="accent-swatch-color" style="--swatch-color: #1e88e5;"></span>
+                                        <span>Blue</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#3949ab">
+                                        <span class="accent-swatch-color" style="--swatch-color: #3949ab;"></span>
+                                        <span>Indigo</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#ffffff">
+                                        <span class="accent-swatch-color" style="--swatch-color: #ffffff;"></span>
+                                        <span>White</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#111111">
+                                        <span class="accent-swatch-color" style="--swatch-color: #111111;"></span>
+                                        <span>Black</span>
+                                    </button>
+                                    <button class="accent-swatch" type="button" data-accent-color="#fdd835">
+                                        <span class="accent-swatch-color" style="--swatch-color: #fdd835;"></span>
+                                        <span>Yellow</span>
+                                    </button>
+                                </div>
+                                <label class="accent-picker">
+                                    <span class="accent-picker-label">Pick your own...</span>
+                                    <input type="color" id="accentColorPicker" value="#d03505">
+                                </label>
+                            </div>
+
+                            <hr class="settings-divider">
+
                             <legend class="toggle-label"><i class="fa-solid fa-lock"></i> Data management
                             </legend>
                             <button class="secondary" id="deleteCredentialsBtn" type="button">
@@ -520,6 +565,15 @@
                             <i class="fa-solid fa-scroll"></i>
                             Release notes
                         </h1>
+                        <details>
+                            <summary>
+                                <h3>Version 5</h3>
+                            </summary>
+                            <p class="muted">30 Mar 2026</p>
+                            <ul>
+                                <li>Added an accent color modifier to settings</li>
+                            </ul>
+                        </details>
                         <details>
                             <summary>
                                 <h3>Version 4b</h3>

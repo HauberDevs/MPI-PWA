@@ -260,7 +260,7 @@ body.dark .onboarding-card details {
 
 .onboarding-card details[open] {
   border-color: var(--accent);
-  background: rgba(208, 53, 5, 0.06);
+  background: rgba(var(--accent-rgb), 0.06);
 }
 
 .embedded-frame-panel {
@@ -370,6 +370,99 @@ body.dark .result-panel {
   font-size: 1.1rem;
   margin-bottom: 0.8rem;
   margin-top: 0.5rem;
+}
+
+.accent-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.accent-presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.accent-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  font-weight: 600;
+  color: inherit;
+  transition: border 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.accent-swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.accent-swatch:hover {
+  transform: translateY(-1px);
+}
+
+.accent-swatch.accent-swatch-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.1);
+}
+
+.accent-swatch-color {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  background: var(--swatch-color, currentColor);
+  flex-shrink: 0;
+}
+
+body.dark .accent-swatch-color {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.accent-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border);
+  padding: 0.65rem 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accent-picker input[type="color"] {
+  border: none;
+  background: transparent;
+  width: 48px;
+  height: 32px;
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--radius-sm);
+}
+
+.accent-picker input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+.accent-picker input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+.accent-reset-btn {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .accountMenu .menu-link {
