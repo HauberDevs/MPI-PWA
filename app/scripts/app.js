@@ -1,4 +1,5 @@
 const routeLinks = document.querySelectorAll("a[data-route]");
+const RECENT_RECIPIENTS_EVENT = "recentRecipientsUpdate";
 
 if (typeof window.DEV_MODE === "undefined") {
   window.DEV_MODE = false;
@@ -772,9 +773,90 @@ function loadTransactionDetailFromLocation() {
   loadTransactionDetail(transactionId);
 }
 
+function normalizeRecipientValue(value) {
+  if (typeof value === "number") return `${value}`;
+  if (typeof value === "string") return value.trim();
+  return "";
+}
+
+function getSelfRecipientAliases() {
+  const aliases = new Set();
+  if (!accountInfoCache) return aliases;
+  const add = (value) => {
+    const normalized = normalizeRecipientValue(value);
+    if (normalized) aliases.add(normalized.toLowerCase());
+  };
+
+  const username = accountInfoCache.username;
+  add(username);
+  if (username) add(`@${username}`);
+
+  add(accountInfoCache.id);
+  add(accountInfoCache.account_id);
+  add(accountInfoCache.user_id);
+  add(accountInfoCache.display_name);
+
+  const firstName = normalizeRecipientValue(accountInfoCache.first_name);
+  const lastName = normalizeRecipientValue(accountInfoCache.last_name);
+  add(firstName);
+  add(lastName);
+
+  const fullName = `${firstName || ""} ${lastName || ""}`.trim();
+  add(fullName);
+
+  return aliases;
+}
+
+function getRecentTransactionRecipients(limit = 5) {
+  if (!Array.isArray(transactionsCache) || transactionsCache.length === 0) return [];
+  const normalizedLimit = Number.isFinite(limit) && limit > 0 ? limit : 5;
+  const selfAliases = getSelfRecipientAliases();
+  const seen = new Set();
+  const recipients = [];
+  for (const txn of transactionsCache) {
+    if (!txn) continue;
+    const nameValue = normalizeRecipientValue(txn.target_name);
+    const fallbackValue = normalizeRecipientValue(txn.target_id);
+    const candidate = nameValue || fallbackValue;
+    if (!candidate) continue;
+     const candidateLower = candidate.toLowerCase();
+     const nameLower = nameValue ? nameValue.toLowerCase() : null;
+     const fallbackLower = fallbackValue ? fallbackValue.toLowerCase() : null;
+     if (selfAliases.has(candidateLower) || (nameLower && selfAliases.has(nameLower)) || (fallbackLower && selfAliases.has(fallbackLower))) {
+       continue;
+     }
+    const key = candidate.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    recipients.push({
+      value: candidate,
+      label: nameValue || fallbackValue || candidate,
+      lastDate: txn.created || null
+    });
+    if (recipients.length >= normalizedLimit) break;
+  }
+  return recipients.slice(0, normalizedLimit);
+}
+
+function emitRecentRecipientsUpdate() {
+  if (typeof window === "undefined") return;
+  const detail = { recipients: getRecentTransactionRecipients() };
+  let event;
+  if (typeof window.CustomEvent === "function") {
+    event = new window.CustomEvent(RECENT_RECIPIENTS_EVENT, { detail });
+  } else if (typeof document !== "undefined" && document.createEvent) {
+    event = document.createEvent("CustomEvent");
+    event.initCustomEvent(RECENT_RECIPIENTS_EVENT, false, false, detail);
+  }
+  if (event) {
+    window.dispatchEvent(event);
+  }
+}
+
 function updateTransactions(data) {
   transactionsCache = Array.isArray(data) ? data : [];
   renderRecentTransactions(transactionsCache);
+  emitRecentRecipientsUpdate();
   if (currentRoute === "history") {
     renderHistory();
   }
@@ -891,6 +973,7 @@ function resetApplicationState() {
   if (refreshHistoryBtn) refreshHistoryBtn.classList.add("hidden");
   if (ctaCard) ctaCard.classList.add("hidden");
   renderRecentTransactions([]);
+  emitRecentRecipientsUpdate();
   renderHistory();
   renderAccountInfo();
   resetTransactionDetailView("Select a transaction to view the details.");
@@ -1633,7 +1716,8 @@ window.MyPayApp = {
   updateBalance: (value) => {
     setBalanceDisplay(value);
   },
-  refreshTransactions: () => loadTransactions({ showErrors: false })
+  refreshTransactions: () => loadTransactions({ showErrors: false }),
+  getRecentRecipients: () => getRecentTransactionRecipients()
 };
 if (displayPrefUsername) {
   displayPrefUsername.addEventListener("change", () => {
