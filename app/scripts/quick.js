@@ -12,6 +12,8 @@ function initQuickActions() {
   const transferForm = document.getElementById("transferForm");
   const paymentLinkForm = document.getElementById("paymentLinkForm");
   const lookupLinkForm = document.getElementById("lookupLinkForm");
+  const recentRecipientsContainer = document.getElementById("recentRecipients");
+  const recipientInput = transferForm ? transferForm.querySelector("input[name='recipient']") : null;
 
   const transferStatus = document.getElementById("transferStatus");
   const paymentLinkStatus = document.getElementById("paymentLinkStatus");
@@ -40,6 +42,149 @@ function initQuickActions() {
     paymentLinkCopyValue = value;
     if (paymentLinkCopyBtn) paymentLinkCopyBtn.disabled = !value;
   };
+
+  const RECENT_RECIPIENTS_KEY = "mypayindia.recentRecipients";
+  const RECENT_RECIPIENTS_EVENT = "recentRecipientsUpdate";
+
+  const getStoredRecipients = () => {
+    try {
+      const stored = localStorage.getItem(RECENT_RECIPIENTS_KEY);
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed.filter((value) => typeof value === "string" && value.trim()) : [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const storeRecipients = (list) => {
+    try {
+      localStorage.setItem(
+        RECENT_RECIPIENTS_KEY,
+        JSON.stringify(Array.isArray(list) ? list.map((value) => (value || "").trim()).filter(Boolean).slice(0, 5) : [])
+      );
+    } catch (err) {
+      // ignore storage issues
+    }
+  };
+
+  const getAppRecentRecipients = () => {
+    try {
+      if (typeof app.getRecentRecipients !== "function") return [];
+      const result = app.getRecentRecipients() || [];
+      if (!Array.isArray(result)) return [];
+      return result
+        .map((entry) => {
+          if (!entry || typeof entry !== "object") return null;
+          const value = typeof entry.value === "string" ? entry.value.trim() : "";
+          if (!value) return null;
+          const label =
+            typeof entry.label === "string" && entry.label.trim() ? entry.label.trim() : value;
+          const lastDate = entry.lastDate || entry.created || null;
+          return { value, label, lastDate };
+        })
+        .filter(Boolean);
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const getRecipientsForDisplay = () => {
+    const normalizeEntry = (entry) => {
+      if (!entry) return null;
+      const base = typeof entry === "string" ? { value: entry } : entry;
+      const value = typeof base.value === "string" ? base.value.trim() : "";
+      if (!value) return null;
+      const label =
+        typeof base.label === "string" && base.label.trim() ? base.label.trim() : value;
+      const lastDate = base.lastDate || null;
+      return { value, label, lastDate };
+    };
+
+    const combined = [];
+    const seen = new Set();
+
+    getAppRecentRecipients().forEach((entry) => {
+      const normalized = normalizeEntry(entry);
+      if (!normalized) return;
+      const key = normalized.value.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      combined.push(normalized);
+    });
+
+    getStoredRecipients().forEach((entry) => {
+      const normalized = normalizeEntry(entry);
+      if (!normalized) return;
+      const key = normalized.value.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      combined.push(normalized);
+    });
+
+    return combined.slice(0, 5);
+  };
+
+  const rememberRecipient = (value) => {
+    const trimmed = (value || "").trim();
+    if (!trimmed) return;
+    const existing = getStoredRecipients().filter((item) => item.toLowerCase() !== trimmed.toLowerCase());
+    existing.unshift(trimmed);
+    storeRecipients(existing);
+    renderRecentRecipients();
+  };
+
+  const formatLastTransactionDate = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+  };
+
+  const buildRecipientTitle = (entry) => {
+    const formattedDate = formatLastTransactionDate(entry.lastDate);
+    if (formattedDate) {
+      return `Your last transaction with them was on ${formattedDate}`;
+    }
+    return `Start a new transaction with ${entry.label}`;
+  };
+
+  const renderRecentRecipients = () => {
+    if (!recentRecipientsContainer) return;
+    const recipients = getRecipientsForDisplay();
+    recentRecipientsContainer.innerHTML = "";
+    if (!recipients.length) {
+      recentRecipientsContainer.classList.add("hidden");
+      return;
+    }
+    recipients.forEach((recipient) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "recent-recipient-btn";
+      btn.dataset.value = recipient.value;
+      btn.title = buildRecipientTitle(recipient);
+      btn.setAttribute("aria-label", `Transfer to ${recipient.label}`);
+      btn.textContent = recipient.label;
+      recentRecipientsContainer.appendChild(btn);
+    });
+    recentRecipientsContainer.classList.remove("hidden");
+  };
+
+  if (recentRecipientsContainer) {
+    recentRecipientsContainer.addEventListener("click", (event) => {
+      const clickTarget = event.target;
+      const target = clickTarget instanceof Element ? clickTarget.closest(".recent-recipient-btn") : null;
+      if (!target) return;
+      const value = target.dataset.value;
+      if (recipientInput && value) {
+        recipientInput.value = value;
+        recipientInput.focus();
+      }
+    });
+    if (typeof window !== "undefined") {
+      window.addEventListener(RECENT_RECIPIENTS_EVENT, () => renderRecentRecipients());
+    }
+    renderRecentRecipients();
+  }
 
   hidePaymentResult();
   if (lookupResult) lookupResult.classList.add("hidden");
@@ -153,6 +298,7 @@ function initQuickActions() {
         if (res.new_balance && app.updateBalance) {
           app.updateBalance(res.new_balance);
         }
+        rememberRecipient(payload.recipient);
         setStatus(
           transferStatus,
           `Sent ${app.formatCurrency ? app.formatCurrency(payload.amount) : payload.amount}`,
