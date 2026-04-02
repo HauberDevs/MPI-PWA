@@ -100,6 +100,43 @@
   margin-top: 0.3rem;
 }
 
+.recent-recipients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: -0.2rem;
+}
+
+.recent-recipient-btn {
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  color: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+body.dark .recent-recipient-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.recent-recipient-btn:hover,
+.recent-recipient-btn:focus-visible {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
 .form-status {
   min-height: 1.2rem;
 }
