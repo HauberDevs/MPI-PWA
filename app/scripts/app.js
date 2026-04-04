@@ -164,8 +164,7 @@ const NAV_ROUTES = new Set([
 ]);
 
 const TEAM_DATA_URL = "https://pr.app.mypayindia.com/api/v1/team";
-const TEAM_IMAGE_BASE_URL = "https://mypayindia.com/siteassets/images/team/";
-const TEAM_FALLBACK_IMAGE = "/app/media/logofull.png";
+const TEAM_FALLBACK_IMAGE = "/app/media/logo.png";
 const TEAM_SOCIAL_ICONS = {
   website: "fa-solid fa-globe",
   twitter: "fa-brands fa-twitter",
@@ -1117,10 +1116,7 @@ function getTeamSocialIconClass(label) {
 
 function buildTeamImageUrl(image) {
   if (!image) return TEAM_FALLBACK_IMAGE;
-  if (/^https?:\/\//i.test(image)) return image;
-  const base = TEAM_IMAGE_BASE_URL.replace(/\/+$/, "");
-  const trimmed = String(image).replace(/^\/+/, "");
-  return `${base}/${trimmed}`;
+  return String(image).trim();
 }
 
 function buildTeamCard(member) {
