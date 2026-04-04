@@ -39,6 +39,7 @@ const accountInfoView = document.getElementById("accountInfoView");
 const settingsView = document.getElementById("settingsView");
 const settingsForm = document.getElementById("settingsForm");
 const displayPrefUsername = document.getElementById("displayPrefUsername");
+const displayPrefFirst = document.getElementById("displayPrefFirst");
 const displayPrefFull = document.getElementById("displayPrefFull");
 const autoRefreshToggle = document.getElementById("autoRefreshToggle");
 const teamView = document.getElementById("teamView");
@@ -162,8 +163,8 @@ const NAV_ROUTES = new Set([
   "me"
 ]);
 
-const TEAM_DATA_URL = "https://i.exerinity.com/mypayindia-team.json";
-const TEAM_IMAGE_BASE_URL = "https://mypayindia.com/siteassets/images/profile_images/";
+const TEAM_DATA_URL = "https://pr.app.mypayindia.com/api/v1/team";
+const TEAM_IMAGE_BASE_URL = "https://mypayindia.com/siteassets/images/team/";
 const TEAM_FALLBACK_IMAGE = "/app/media/logofull.png";
 const TEAM_SOCIAL_ICONS = {
   website: "fa-solid fa-globe",
@@ -921,14 +922,14 @@ const DISPLAY_NAME_STORAGE_KEY = "display";
 function getDisplayNamePreference() {
   try {
     const v = window.localStorage.getItem(DISPLAY_NAME_STORAGE_KEY);
-    return v === "full" ? "full" : "user";
+    return (v === "full" || v === "first") ? v : "user";
   } catch (err) {
     return "user";
   }
 }
 
 function setDisplayNamePreference(value) {
-  const normalized = value === "full" ? "full" : "user";
+  const normalized = value === "full" || value === "first" ? value : "user";
   try {
     window.localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, normalized);
   } catch (err) {
@@ -947,6 +948,10 @@ function computePreferredName() {
     const last = (info.last_name || "").trim();
     const full = `${first} ${last}`.trim();
     return full || username || "";
+  }
+  if (pref === "first") {
+    const first = (info.first_name || "").trim();
+    return first || username || "";
   }
   return username || "";
 }
@@ -1216,12 +1221,11 @@ async function loadTeam() {
   });
 
   try {
-    const response = await fetch(TEAM_DATA_URL, { cache: "no-cache" });
-    if (!response.ok) {
-      throw new Error(`Failed with status ${response.status}`);
+    const response = await apiTeam();
+    if (!response.success) {
+      throw new Error(response.message || "Failed to fetch team data");
     }
-    const data = await response.json();
-    teamCache = Array.isArray(data) ? data : [];
+    teamCache = Array.isArray(response?.data) ? response.data : [];
     renderTeam();
   } catch (err) {
     teamCache = null;
@@ -1324,19 +1328,33 @@ routeLinks.forEach((link) => {
 function renderSettings() {
   if (!settingsView || !settingsForm) return;
   const pref = getDisplayNamePreference();
-  if (displayPrefUsername) displayPrefUsername.checked = pref !== "full";
+  if (displayPrefUsername) displayPrefUsername.checked = pref === "user";
+  if (displayPrefFirst) displayPrefFirst.checked = pref === "first";
   if (displayPrefFull) displayPrefFull.checked = pref === "full";
   const fullAvailable = Boolean(
     accountInfoCache && (((accountInfoCache.first_name || "").trim()) || ((accountInfoCache.last_name || "").trim()))
   );
+  const firstAvailable = Boolean(
+    accountInfoCache && ((accountInfoCache.first_name || "").trim())
+  );
   if (displayPrefFull) {
-    const disable = (!fullAvailable && !isLoggedIn) || (!fullAvailable && pref === "username");
-    displayPrefFull.disabled = disable;
-    displayPrefFull.title = disable ? "Full name not available" : "";
+    displayPrefFull.disabled = !fullAvailable;
+    displayPrefFull.title = !fullAvailable ? "Full name not available" : "";
+  }
+  if (displayPrefFirst) {
+    displayPrefFirst.disabled = !firstAvailable;
+    displayPrefFirst.title = !firstAvailable ? "First name not available" : "";
   }
   if (!fullAvailable && pref === "full") {
-    setDisplayNamePreference("username");
+    setDisplayNamePreference("user");
     if (displayPrefUsername) displayPrefUsername.checked = true;
+    if (displayPrefFirst) displayPrefFirst.checked = false;
+    if (displayPrefFull) displayPrefFull.checked = false;
+  }
+  if (!firstAvailable && pref === "first") {
+    setDisplayNamePreference("user");
+    if (displayPrefUsername) displayPrefUsername.checked = true;
+    if (displayPrefFirst) displayPrefFirst.checked = false;
     if (displayPrefFull) displayPrefFull.checked = false;
   }
   updateSettingsUIState();
@@ -1347,6 +1365,7 @@ function updateSettingsUIState() {
   const chips = settingsForm.querySelectorAll("label.radio-chip");
   chips.forEach((chip) => chip.classList.remove("selected"));
   if (displayPrefUsername?.checked) displayPrefUsername.closest("label")?.classList.add("selected");
+  if (displayPrefFirst?.checked) displayPrefFirst.closest("label")?.classList.add("selected");
   if (displayPrefFull?.checked) displayPrefFull.closest("label")?.classList.add("selected");
 }
 
@@ -1722,6 +1741,12 @@ window.MyPayApp = {
 if (displayPrefUsername) {
   displayPrefUsername.addEventListener("change", () => {
     if (displayPrefUsername.checked) setDisplayNamePreference("username");
+    updateSettingsUIState();
+  });
+}
+if (displayPrefFirst) {
+  displayPrefFirst.addEventListener("change", () => {
+    if (displayPrefFirst.checked) setDisplayNamePreference("first");
     updateSettingsUIState();
   });
 }

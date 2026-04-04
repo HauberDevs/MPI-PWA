@@ -98,3 +98,11 @@ async function apiGetPaymentLink(token) {
   const data = await res.json();
   return { status: res.status, ...data };
 }
+
+async function apiTeam() {
+  const res = await fetch(path + "/api/v1/team", {
+    cache: "no-cache"
+  });
+
+  return res.json();
+}
